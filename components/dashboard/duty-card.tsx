@@ -1,0 +1,143 @@
+
+'use client';
+
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogDescription, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from '@/components/ui/dialog';
+import { Plane, Clock, MapPin, ArrowRight, RefreshCw } from 'lucide-react';
+import { format } from 'date-fns';
+import SwapRequestModal from './swap-request-modal';
+
+interface Duty {
+  id: string;
+  flightNumber: string;
+  date: string;
+  departureTime: string;
+  arrivalTime: string;
+  departureLocation: string;
+  arrivalLocation: string;
+}
+
+interface DutyCardProps {
+  duty: Duty;
+  onSwapRequested?: () => void;
+}
+
+export default function DutyCard({ duty, onSwapRequested }: DutyCardProps) {
+  const [showSwapModal, setShowSwapModal] = useState(false);
+
+  const formatTime = (timeString: string) => {
+    return format(new Date(timeString), 'HH:mm');
+  };
+
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'MMM dd, yyyy');
+  };
+
+  const getDayOfWeek = (dateString: string) => {
+    return format(new Date(dateString), 'EEEE');
+  };
+
+  const calculateDuration = (departure: string, arrival: string) => {
+    const dep = new Date(departure);
+    const arr = new Date(arrival);
+    const diffMs = arr.getTime() - dep.getTime();
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h${minutes > 0 ? ` ${minutes}m` : ''}`;
+  };
+
+  return (
+    <>
+      <Card className="hover:shadow-lg transition-shadow duration-200 bg-white border border-gray-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Plane className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg font-bold text-blue-600">
+                  {duty.flightNumber}
+                </CardTitle>
+                <p className="text-sm text-gray-500">{getDayOfWeek(duty.date)}</p>
+              </div>
+            </div>
+            <Badge variant="outline" className="text-sm">
+              {formatDate(duty.date)}
+            </Badge>
+          </div>
+        </CardHeader>
+        
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">
+                  {formatTime(duty.departureTime)}
+                </p>
+                <p className="text-sm text-gray-500 font-medium">
+                  {duty.departureLocation}
+                </p>
+              </div>
+              
+              <div className="flex flex-col items-center gap-1 px-3">
+                <ArrowRight className="w-4 h-4 text-gray-400" />
+                <p className="text-xs text-gray-500">
+                  {calculateDuration(duty.departureTime, duty.arrivalTime)}
+                </p>
+              </div>
+              
+              <div className="text-center">
+                <p className="text-lg font-bold text-gray-900">
+                  {formatTime(duty.arrivalTime)}
+                </p>
+                <p className="text-sm text-gray-500 font-medium">
+                  {duty.arrivalLocation}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+            <Clock className="w-4 h-4 text-gray-400" />
+            <span className="text-sm text-gray-600">
+              Duration: {calculateDuration(duty.departureTime, duty.arrivalTime)}
+            </span>
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => setShowSwapModal(true)}
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Request Swap
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <SwapRequestModal
+        isOpen={showSwapModal}
+        onClose={() => setShowSwapModal(false)}
+        senderDuty={duty}
+        onSwapRequested={() => {
+          setShowSwapModal(false);
+          onSwapRequested?.();
+        }}
+      />
+    </>
+  );
+}

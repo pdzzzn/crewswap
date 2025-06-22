@@ -1,0 +1,1 @@
+{"version":1,"functions":{"/api/auth/logout":{},"/api/auth/me":{},"/api/auth/login":{},"/api/auth/register":{},"/api/dashboard/stats":{},"/api/duties":{},"/api/duties/available":{},"/api/notifications":{},"/api/notifications/[id]/read":{},"/api/swap-requests/[id]/respond":{},"/api/swap-requests":{}}}

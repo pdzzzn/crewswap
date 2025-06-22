@@ -1,0 +1,106 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/user/aviation-crew-swap/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+    CAPTAIN
+    FIRST_OFFICER
+    PURSER
+    CABIN_ATTENDANT
+}
+
+enum SwapRequestStatus {
+    PENDING
+    APPROVED
+    DENIED
+    CANCELLED
+}
+
+enum NotificationType {
+    SWAP_REQUEST_RECEIVED
+    SWAP_REQUEST_APPROVED
+    SWAP_REQUEST_DENIED
+    SWAP_REQUEST_CANCELLED
+}
+
+model User {
+    id        String   @id @default(cuid())
+    email     String   @unique
+    name      String
+    role      UserRole
+    password  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    duties                Duty[]
+    sentSwapRequests      SwapRequest[] @relation("SwapRequestSender")
+    receivedSwapRequests  SwapRequest[] @relation("SwapRequestReceiver")
+    notifications         Notification[]
+
+    @@map("users")
+}
+
+model Duty {
+    id               String   @id @default(cuid())
+    flightNumber     String
+    date             DateTime
+    departureTime    DateTime
+    arrivalTime      DateTime
+    departureLocation String
+    arrivalLocation  String
+    userId           String
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+
+    // Relations
+    user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+    sentSwapRequests  SwapRequest[] @relation("SwapRequestSenderDuty")
+    targetSwapRequests SwapRequest[] @relation("SwapRequestTargetDuty")
+
+    @@map("duties")
+}
+
+model SwapRequest {
+    id              String            @id @default(cuid())
+    senderId        String
+    receiverId      String
+    senderDutyId    String
+    targetDutyId    String
+    status          SwapRequestStatus @default(PENDING)
+    message         String?
+    responseMessage String?
+    createdAt       DateTime          @default(now())
+    updatedAt       DateTime          @updatedAt
+
+    // Relations
+    sender      User @relation("SwapRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+    receiver    User @relation("SwapRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+    senderDuty  Duty @relation("SwapRequestSenderDuty", fields: [senderDutyId], references: [id], onDelete: Cascade)
+    targetDuty  Duty @relation("SwapRequestTargetDuty", fields: [targetDutyId], references: [id], onDelete: Cascade)
+
+    @@map("swap_requests")
+}
+
+model Notification {
+    id        String           @id @default(cuid())
+    userId    String
+    type      NotificationType
+    title     String
+    message   String
+    isRead    Boolean          @default(false)
+    swapRequestId String?
+    createdAt DateTime         @default(now())
+
+    // Relations
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("notifications")
+}
