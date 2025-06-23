@@ -1,19 +1,19 @@
-
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
+  DropdownMenuLabel, 
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Plane, Bell, User, LogOut, Calendar, Users } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Plane, Menu, LayoutDashboard, CalendarCheck, Repeat, Bell, LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
@@ -23,142 +23,123 @@ interface User {
 }
 
 interface HeaderProps {
-  user: User;
+  user: User | null;
 }
 
 export default function Header({ user }: HeaderProps) {
-  const [notifications, setNotifications] = useState<any[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const router = useRouter();
-  const { toast } = useToast();
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch('/api/notifications');
-      if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.notifications);
-        setUnreadCount(data.notifications.filter((n: any) => !n.isRead).length);
-      }
-    } catch (error) {
-      console.error('Failed to fetch notifications:', error);
-    }
-  };
 
   const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      toast({
-        title: 'Signed out',
-        description: 'You have been successfully signed out.',
-      });
-      router.push('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
   };
 
-  const formatRole = (role: string) => {
-    return role.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-  };
+  const navLinks = [
+    { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { href: '/roster', label: 'Roster', icon: CalendarCheck },
+    { href: '/swap-requests', label: 'Swap Requests', icon: Repeat },
+    { href: '/notifications', label: 'Notifications', icon: Bell },
+  ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="container max-w-screen-xl mx-auto flex h-16 items-center justify-between px-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-600 rounded-lg">
-            <Plane className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">Aviation Crew Portal</h1>
-            <p className="text-sm text-gray-500">Duty Management System</p>
-          </div>
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* The main container uses flex and items-center */}
+      <div className="container max-w-screen-xl mx-auto h-16 flex items-center">
+
+        {/* --- Left Section --- */}
+        {/* This div pushes everything else to the right. 'flex-1' makes it grow. */}
+        <div className="flex-1 flex justify-start">
+          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
+            <Plane className="w-6 h-6 text-blue-600" />
+            <span className="hidden sm:inline-block">CrewSwap</span>
+          </Link>
         </div>
 
-        <nav className="hidden md:flex items-center gap-6">
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2"
-            onClick={() => router.push('/dashboard')}
-          >
-            <Calendar className="w-4 h-4" />
-            Dashboard
-          </Button>
-          <Button
-            variant="ghost"
-            className="flex items-center gap-2"
-            onClick={() => router.push('/swap-requests')}
-          >
-            <Users className="w-4 h-4" />
-            Swap Requests
-          </Button>
-        </nav>
-
-        <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="relative"
-            onClick={() => router.push('/notifications')}
-          >
-            <Bell className="w-5 h-5" />
-            {unreadCount > 0 && (
-              <Badge 
-                variant="destructive" 
-                className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+        {/* --- Center Section --- */}
+        {/* This nav will not grow ('flex-none') and will be centered between the left and right sections. */}
+        <nav className="hidden md:flex flex-none justify-center items-center gap-2">
+          {navLinks.map(link => (
+            <Button key={link.href} variant="ghost" asChild>
+              <Link 
+                href={link.href}
+                className="text-muted-foreground transition-colors hover:text-foreground"
               >
-                {unreadCount}
-              </Badge>
-            )}
-          </Button>
+                {link.label}
+              </Link>
+            </Button>
+          ))}
+        </nav>
+        
+        {/* --- Right Section --- */}
+        {/* This div also grows ('flex-1') and pushes its content to the very end. */}
+        <div className="flex-1 flex justify-end items-center gap-4">
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Avatar className="h-9 w-9 cursor-pointer">
+                  <AvatarImage src={`https://avatar.vercel.sh/${user.email}.png`} alt={user.name} />
+                  <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.name}</p>
+                    <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/dashboard')}>
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  <span>Dashboard</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/roster')}>
+                   <CalendarCheck className="mr-2 h-4 w-4" />
+                  <span>Roster</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Logout</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button asChild>
+              <Link href="/login">Login</Link>
+            </Button>
+          )}
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium">{user.name}</p>
-                  <p className="text-xs text-gray-500">{formatRole(user.role)}</p>
+          {/* Mobile Menu Trigger */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left">
+                <div className="mb-8">
+                  <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
+                    <Plane className="w-6 h-6 text-blue-600" />
+                    <span>CrewSwap</span>
+                  </Link>
                 </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <div className="px-2 py-1.5">
-                <p className="text-sm font-medium">{user.name}</p>
-                <p className="text-xs text-gray-500">{user.email}</p>
-                <Badge variant="secondary" className="mt-1 text-xs">
-                  {formatRole(user.role)}
-                </Badge>
-              </div>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push('/dashboard')}>
-                <Calendar className="w-4 h-4 mr-2" />
-                Dashboard
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/swap-requests')}>
-                <Users className="w-4 h-4 mr-2" />
-                Swap Requests
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/notifications')}>
-                <Bell className="w-4 h-4 mr-2" />
-                Notifications
-                {unreadCount > 0 && (
-                  <Badge variant="destructive" className="ml-auto h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs">
-                    {unreadCount}
-                  </Badge>
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <nav className="grid gap-4 text-lg font-medium">
+                  {navLinks.map(link => (
+                    <Link 
+                      key={link.href}
+                      href={link.href}
+                      className="flex items-center gap-4 rounded-lg py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-gray-100"
+                    >
+                      <link.icon className="h-5 w-5" />
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </header>
