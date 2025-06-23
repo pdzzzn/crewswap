@@ -1,28 +1,17 @@
-export type Expense = {
-  id: string
-  amount: number
-  category: string
-  description: string
-  date: Date
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
 }
 
-export type ExpenseFormData = Omit<Expense, 'id' | 'date'> & {
-  date: string
-}
-
-export const EXPENSE_CATEGORIES = [
-  'Food',
-  'Transportation',
-  'Housing',
-  'Utilities',
-  'Entertainment',
-  'Healthcare',
-  'Shopping',
-  'Education',
-  'Other'
-] as const
-
-export type DateRange = {
-  from: Date | undefined
-  to: Date | undefined
+export interface Duty {
+  id: string;
+  flightNumber: string;
+  date: string;
+  departureTime: string;
+  arrivalTime: string;
+  departureLocation: string;
+  arrivalLocation: string;
 }
