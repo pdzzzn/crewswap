@@ -1,11 +1,11 @@
 Whats next:
 
-1. Update duty modal: 
+[✔]1. Update duty modal: 
     - Auto close datepicker after date selection
     - Manual date entry
-2. Insert Duties from Modal into database
-3. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
-4. Add filters to roster page 
+[ ]2. Insert Duties from Modal into database
+[ ]3. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
+[ ]4. Add filters to roster page 
     - Filter by Departure Location
     - Arrival Location
 
