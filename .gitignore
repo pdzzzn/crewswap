@@ -1,4 +1,8 @@
-node_modules/
-.next/
-.swc/
 .*.env
+.env
+.build/
+.next/
+.yarn/
+node_modules/
+codebase.md
+.next/*

@@ -159,6 +159,7 @@ export default function RosterPage() {
                   {groupedDuties.get(dateKey)?.userDuty ? (
                     <DutyCard
                       duty={groupedDuties.get(dateKey)!.userDuty!}
+                      showSwapButton={false}
                       onSwapRequested={handleSwapRequested}
                     />
                   ) : (

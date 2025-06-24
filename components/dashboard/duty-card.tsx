@@ -5,34 +5,33 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
 } from '@/components/ui/dialog';
+import { X } from 'lucide-react'; // <-- Make sure to add X to your lucide-react import
 import { Plane, Clock, MapPin, ArrowRight, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
 import SwapRequestModal from './swap-request-modal';
-
-interface Duty {
-  id: string;
-  flightNumber: string;
-  date: string;
-  departureTime: string;
-  arrivalTime: string;
-  departureLocation: string;
-  arrivalLocation: string;
-}
+import { Duty } from '@/lib/types';
 
 interface DutyCardProps {
   duty: Duty;
   onSwapRequested?: () => void;
+  showSwapButton?: boolean; // New prop to control swap button visibility
+  onDelete?: (dutyId: string) => void; // New prop for the delete callback
 }
 
-export default function DutyCard({ duty, onSwapRequested }: DutyCardProps) {
+export default function DutyCard({
+  duty,
+  onSwapRequested,
+  showSwapButton = true, // Default to true so it doesn't break elsewhere
+  onDelete
+}: DutyCardProps) {
   const [showSwapModal, setShowSwapModal] = useState(false);
 
   const formatTime = (timeString: string) => {
@@ -59,6 +58,17 @@ export default function DutyCard({ duty, onSwapRequested }: DutyCardProps) {
   return (
     <>
       <Card className="hover:shadow-lg transition-shadow duration-200 bg-white border border-gray-200">
+        {/* Conditional Delete Button */}
+        {onDelete && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="mx-auto top-1 right-1 h-7 w-7 rounded-full z-10"
+            onClick={() => onDelete(duty.id)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -77,7 +87,7 @@ export default function DutyCard({ duty, onSwapRequested }: DutyCardProps) {
             </Badge>
           </div>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -89,14 +99,14 @@ export default function DutyCard({ duty, onSwapRequested }: DutyCardProps) {
                   {duty.departureLocation}
                 </p>
               </div>
-              
+
               <div className="flex flex-col items-center gap-1 px-3">
                 <ArrowRight className="w-4 h-4 text-gray-400" />
                 <p className="text-xs text-gray-500">
                   {calculateDuration(duty.departureTime, duty.arrivalTime)}
                 </p>
               </div>
-              
+
               <div className="text-center">
                 <p className="text-lg font-bold text-gray-900">
                   {formatTime(duty.arrivalTime)}
@@ -115,17 +125,20 @@ export default function DutyCard({ duty, onSwapRequested }: DutyCardProps) {
             </span>
           </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={() => setShowSwapModal(true)}
-            >
-              <RefreshCw className="w-4 h-4 mr-2" />
-              Request Swap
-            </Button>
-          </div>
+          {/* The existing swap button is now wrapped in this condition */}
+          {showSwapButton && (
+            <div className="flex gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex-1"
+                onClick={() => setShowSwapModal(true)}
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Request Swap
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
 

@@ -1,0 +1,6 @@
+.env
+/.build
+/.next
+/.yarn
+/node_modules
+codebase.md
