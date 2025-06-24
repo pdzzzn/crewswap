@@ -18,11 +18,23 @@ const roles = [
   { value: 'CABIN_ATTENDANT', label: 'Cabin Attendant' },
 ];
 
+const bases = [
+  { value: 'PMI', label: 'Palma de Mallorca (PMI)' },
+  { value: 'ARN', label: 'Stockholm (ARN)' },
+  { value: 'PRG', label: 'Prague (PRG)' },
+  { value: 'SZG', label: 'Salzburg (SZG)' },
+  { value: 'VIE', label: 'Vienna (VIE)' },
+  { value: 'WP_PMI', label: 'WP-Palma de Mallorca' },
+  { value: 'WP_BCN', label: 'WP-Barcelona' },
+  { value: 'WP_PRG', label: 'WP-Prague' },
+];
+
 export default function RegisterForm() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('');
+  const [base, setBase] = useState(''); // <-- Add this new state
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -33,8 +45,8 @@ export default function RegisterForm() {
     setIsLoading(true);
     setError('');
 
-    if (!role) {
-      setError('Please select your role');
+    if (!role || !base) {
+      setError('Please select your role and base');
       setIsLoading(false);
       return;
     }
@@ -43,7 +55,7 @@ export default function RegisterForm() {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({ name, email, password, role, base }),
       });
 
       const data = await response.json();
@@ -131,6 +143,21 @@ export default function RegisterForm() {
                   {roles.map((roleOption) => (
                     <SelectItem key={roleOption.value} value={roleOption.value}>
                       {roleOption.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="base">Base</Label>
+              <Select value={base} onValueChange={setBase} disabled={isLoading}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select your base" />
+                </SelectTrigger>
+                <SelectContent>
+                  {bases.map((baseOption) => (
+                    <SelectItem key={baseOption.value} value={baseOption.value}>
+                      {baseOption.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

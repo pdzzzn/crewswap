@@ -9,7 +9,14 @@ Whats next:
     - Filter by Departure Location
     - Arrival Location
 
+What am I currently doing: 
+- Adding admin role with admin dashboard permissions
+    - Focusing on the problems that may arise by giving a user both admin and regular UserRole (i.e. FIRST_OFFICER)
 
+    -CHECK THE APP/API/AUTH/REGISTER ROUTE FOR ADMIN AND BASE SELECTION !!!
+
+    
+- Creating an admin dashboard ( preferably check shadcnui dashboard example)
 
 
 

@@ -8,10 +8,10 @@ import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, role } = await request.json();
+    const { name, email, password, role, base } = await request.json();
 
     // Validation
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password || !role || !base) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
@@ -45,12 +45,15 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role,
+        base, // <-- Add base to the create data
       },
       select: {
         id: true,
         name: true,
         email: true,
         role: true,
+        base: true, // <-- Add base to the select data
+        isAdmin: true,
       }
     });
 
