@@ -1,5 +1,5 @@
 
-import { PrismaClient, UserRole, SwapRequestStatus, NotificationType } from '@prisma/client';
+import { PrismaClient, UserRole, SwapRequestStatus, NotificationType } from '../app/node_modules/.prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
