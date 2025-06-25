@@ -163,7 +163,7 @@ export default function Header({ user }: HeaderProps) {
                     href="/dashboard"
                     className="flex items-center gap-2 font-bold text-lg"
                   >
-                    <Plane className="w-6 h-6 text-blue-600" />
+                    <Plane className="w-6 h-6 text-primary" />
                     <span>CrewSwap</span>
                   </Link>
                 </div>

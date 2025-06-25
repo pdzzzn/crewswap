@@ -6,13 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Plane, Clock, Users } from 'lucide-react';
 import Header from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import {User} from '@/lib/types';
 
 export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
