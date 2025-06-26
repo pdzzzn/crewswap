@@ -4,3 +4,4 @@
 /.yarn
 /node_modules
 codebase.md
+app/admin/dashboard/data.json

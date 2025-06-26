@@ -140,14 +140,14 @@ export default function SwapRequestModal({
           {/* Your Duty */}
           <div>
             <h3 className="text-lg font-semibold mb-3">Your Duty</h3>
-            <Card className="border-blue-200 bg-blue-50">
+            <Card className="border-blue-200 bg-primary/10">
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Plane className="w-5 h-5 text-blue-600" />
+                    <Plane className="w-5 h-5 text-primary" />
                     <div>
-                      <p className="font-bold text-blue-600">{senderDuty.flightNumber}</p>
-                      <p className="text-sm text-gray-600">{formatDate(senderDuty.date)}</p>
+                      <p className="font-bold text-primary">{senderDuty.flightNumber}</p>
+                      <p className="text-sm text-muted-foreground">{formatDate(senderDuty.date)}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export default function SwapRequestModal({
           <div>
             <h3 className="text-lg font-semibold mb-3">Available Duties to Swap With</h3>
             {availableDuties.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No available duties found.</p>
+              <p className="text-muted-foreground text-center py-8">No available duties found.</p>
             ) : (
               <div className="grid gap-3 max-h-60 overflow-y-auto">
                 {availableDuties.map((duty) => (
@@ -185,10 +185,10 @@ export default function SwapRequestModal({
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                          <Plane className="w-4 h-4 text-gray-600" />
+                          <Plane className="w-4 h-4 text-muted-foreground" />
                           <div>
                             <p className="font-semibold">{duty.flightNumber}</p>
-                            <p className="text-sm text-gray-600">{formatDate(duty.date)}</p>
+                            <p className="text-sm text-muted-foreground">{formatDate(duty.date)}</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -201,8 +201,8 @@ export default function SwapRequestModal({
                             {formatTime(duty.departureTime)} - {formatTime(duty.arrivalTime)}
                           </p>
                           <div className="flex items-center gap-1 mt-1">
-                            <User className="w-3 h-3 text-gray-400" />
-                            <span className="text-xs text-gray-600">{duty.user?.name}</span>
+                            <User className="w-3 h-3 text-muted-foreground/70" />
+                            <span className="text-xs text-muted-foreground">{duty.user?.name}</span>
                             <Badge variant="secondary" className="text-xs ml-1">
                               {formatRole(duty.user?.role || '')}
                             </Badge>
@@ -239,7 +239,7 @@ export default function SwapRequestModal({
             <Button 
               onClick={handleSwapRequest}
               disabled={!selectedDuty || isLoading}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-primary hover:bg-primary/90"
             >
               {isLoading ? 'Sending...' : 'Send Swap Request'}
             </Button>

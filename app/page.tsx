@@ -11,25 +11,24 @@ export default function HomePage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Hero Section */}
+<div className="min-h-screen bg-gradient-to-br from-primary/5 via-primary/10 to-secondary/5">      {/* Hero Section */}
       <div className="container max-w-screen-xl mx-auto px-4 py-16">
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
-            <div className="p-4 bg-blue-600 rounded-full shadow-lg">
-              <Plane className="w-12 h-12 text-white" />
+            <div className="p-4 bg-primary rounded-full shadow-lg">
+              <Plane className="w-12 h-12 text-secondary" />
             </div>
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-5xl font-bold text-foreground mb-4">
             Aviation Crew Portal
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Streamline duty assignments and enable seamless crew schedule swapping for aviation professionals
           </p>
           <div className="flex gap-4 justify-center">
             <Button 
               size="lg" 
-              className="bg-blue-600 hover:bg-blue-700 text-lg px-8 py-3"
+              className="bg-primary hover:bg-primary/90 text-lg px-8 py-3"
               onClick={() => router.push('/login')}
             >
               Sign In
@@ -50,13 +49,13 @@ export default function HomePage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           <Card className="hover:shadow-lg transition-shadow duration-200">
             <CardHeader className="text-center">
-              <div className="mx-auto p-3 bg-blue-100 rounded-full w-fit mb-4">
-                <Calendar className="w-8 h-8 text-blue-600" />
+              <div className="mx-auto p-3 bg-primary/20 rounded-full w-fit mb-4">
+                <Calendar className="w-8 h-8 text-primary" />
               </div>
               <CardTitle className="text-xl">Duty Management</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-center text-gray-600">
+              <CardDescription className="text-center text-muted-foreground">
                 View and manage your assigned flight duties with complete flight information including times, locations, and flight numbers.
               </CardDescription>
             </CardContent>
@@ -70,7 +69,7 @@ export default function HomePage() {
               <CardTitle className="text-xl">Crew Swapping</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-center text-gray-600">
+              <CardDescription className="text-center text-muted-foreground">
                 Request duty swaps with other crew members. Send requests and manage approvals seamlessly through our intuitive interface.
               </CardDescription>
             </CardContent>
@@ -84,7 +83,7 @@ export default function HomePage() {
               <CardTitle className="text-xl">Notifications</CardTitle>
             </CardHeader>
             <CardContent>
-              <CardDescription className="text-center text-gray-600">
+              <CardDescription className="text-center text-muted-foreground">
                 Stay informed about swap requests, approvals, and schedule changes with real-time notifications and updates.
               </CardDescription>
             </CardContent>
@@ -92,8 +91,8 @@ export default function HomePage() {
         </div>
 
         {/* Roles Section */}
-        <div className="bg-white rounded-2xl p-8 shadow-lg">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+        <div className="bg-background rounded-2xl p-8 shadow-lg">
+          <h2 className="text-3xl font-bold text-center text-foreground mb-8">
             Designed for All Aviation Roles
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -104,11 +103,11 @@ export default function HomePage() {
               { role: 'Cabin Attendant', description: 'Flight attendants handling passenger service' }
             ].map((item, index) => (
               <div key={index} className="text-center p-4">
-                <div className="p-3 bg-blue-50 rounded-full w-fit mx-auto mb-3">
-                  <User className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-primary/10 rounded-full w-fit mx-auto mb-3">
+                  <User className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-2">{item.role}</h3>
-                <p className="text-sm text-gray-600">{item.description}</p>
+                <h3 className="font-semibold text-foreground mb-2">{item.role}</h3>
+                <p className="text-sm text-muted-foreground">{item.description}</p>
               </div>
             ))}
           </div>
@@ -116,13 +115,13 @@ export default function HomePage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
+      <footer className="bg-background text-muted-foreground py-8">
         <div className="container max-w-screen-xl mx-auto px-4 text-center">
           <div className="flex justify-center items-center gap-2 mb-4">
             <Plane className="w-6 h-6" />
             <span className="text-lg font-semibold">Aviation Crew Portal</span>
           </div>
-          <p className="text-gray-400">
+          <p className="text-muted-foreground/70">
             Professional duty management for aviation crews
           </p>
         </div>

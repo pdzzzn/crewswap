@@ -24,15 +24,15 @@ interface DutyColumnProps {
 export default function DutyColumn({ date, userDuty, availableDuties, onSwapRequested }: DutyColumnProps) {
   return (
     <div className="flex flex-col w-80 md:w-96 flex-shrink-0">
-      <div className="p-3 text-center font-semibold text-sm text-gray-700 bg-gray-100 rounded-t-lg sticky top-0 z-10 border-b">
+      <div className="p-3 text-center font-semibold text-sm text-foreground/90 bg-muted rounded-t-lg sticky top-0 z-10 border-b">
         {date}
       </div>
-      <div className="h-48 pt-4 px-2 bg-gray-100">
+      <div className="h-48 pt-4 px-2 bg-muted">
         {userDuty ? (
           <DutyCard duty={userDuty} onSwapRequested={onSwapRequested} />
         ) : (
-          <div className="h-full flex items-center justify-center rounded-lg bg-gray-200 border-2 border-dashed">
-            <div className="text-center text-gray-500">
+          <div className="h-full flex items-center justify-center rounded-lg bg-muted border-2 border-dashed">
+            <div className="text-center text-muted-foreground">
               <p className="font-medium">No Duty Scheduled</p>
             </div>
           </div>
@@ -44,7 +44,7 @@ export default function DutyColumn({ date, userDuty, availableDuties, onSwapRequ
             <DutyCard key={duty.id} duty={duty} onSwapRequested={onSwapRequested} />
           ))
         ) : (
-          <div className="text-center text-gray-400 pt-10">
+          <div className="text-center text-muted-foreground/70 pt-10">
             <p>No available swaps for this date.</p>
           </div>
         )}

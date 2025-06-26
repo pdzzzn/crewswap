@@ -66,7 +66,7 @@ export default function Header({ user }: HeaderProps) {
             href="/dashboard"
             className="flex items-center gap-2 font-bold text-lg"
           >
-            <Plane className="w-6 h-6 text-blue-600" />
+            <Plane className="w-6 h-6 text-primary" />
             <span className="hidden sm:inline-block">CrewSwap</span>
           </Link>
         </div>
@@ -89,7 +89,7 @@ export default function Header({ user }: HeaderProps) {
             <Button key={adminLink.href} variant="ghost" asChild>
               <Link
                 href={adminLink.href}
-                className="text-muted-foreground transition-colors hover:text-foreground font-bold text-blue-600"
+                className="text-muted-foreground transition-colors hover:text-foreground font-bold text-primary"
               >
                 {adminLink.label}
               </Link>
@@ -172,7 +172,7 @@ export default function Header({ user }: HeaderProps) {
                     <Link
                       key={link.href}
                       href={link.href}
-                      className="flex items-center gap-4 rounded-lg py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-gray-100"
+                      className="flex items-center gap-4 rounded-lg py-2 px-3 text-muted-foreground hover:text-foreground hover:bg-muted"
                     >
                       <link.icon className="h-5 w-5" />
                       {link.label}

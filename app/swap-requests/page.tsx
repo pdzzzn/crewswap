@@ -181,13 +181,13 @@ export default function SwapRequestsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {type === 'sent' ? (
-              <Send className="w-5 h-5 text-blue-600" />
+              <Send className="w-5 h-5 text-primary" />
             ) : (
               <Inbox className="w-5 h-5 text-green-600" />
             )}
             <div>
               <CardTitle className="text-lg">Swap Request</CardTitle>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {type === 'sent' 
                   ? `To: ${request.receiver?.name}` 
                   : `From: ${request.sender?.name}`
@@ -197,7 +197,7 @@ export default function SwapRequestsPage() {
           </div>
           <div className="text-right">
             {getStatusBadge(request.status)}
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               {format(new Date(request.createdAt), 'MMM dd, HH:mm')}
             </p>
           </div>
@@ -207,19 +207,19 @@ export default function SwapRequestsPage() {
       <CardContent className="space-y-4">
         {/* Flight Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-3 bg-blue-50 rounded-lg">
+          <div className="p-3 bg-primary/10 rounded-lg">
             <p className="text-sm font-medium text-blue-900 mb-2">
               {type === 'sent' ? 'Your Flight' : 'Their Flight'}
             </p>
             <div className="space-y-1">
-              <p className="font-bold text-blue-600">{request.senderDuty.flightNumber}</p>
-              <p className="text-sm text-gray-600">{formatDate(request.senderDuty.date)}</p>
+              <p className="font-bold text-primary">{request.senderDuty.flightNumber}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(request.senderDuty.date)}</p>
               <div className="flex items-center gap-2 text-sm">
                 <span>{request.senderDuty.departureLocation}</span>
                 <ArrowRight className="w-3 h-3" />
                 <span>{request.senderDuty.arrivalLocation}</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {formatTime(request.senderDuty.departureTime)} - {formatTime(request.senderDuty.arrivalTime)}
               </p>
             </div>
@@ -231,13 +231,13 @@ export default function SwapRequestsPage() {
             </p>
             <div className="space-y-1">
               <p className="font-bold text-green-600">{request.targetDuty.flightNumber}</p>
-              <p className="text-sm text-gray-600">{formatDate(request.targetDuty.date)}</p>
+              <p className="text-sm text-muted-foreground">{formatDate(request.targetDuty.date)}</p>
               <div className="flex items-center gap-2 text-sm">
                 <span>{request.targetDuty.departureLocation}</span>
                 <ArrowRight className="w-3 h-3" />
                 <span>{request.targetDuty.arrivalLocation}</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {formatTime(request.targetDuty.departureTime)} - {formatTime(request.targetDuty.arrivalTime)}
               </p>
             </div>
@@ -247,15 +247,15 @@ export default function SwapRequestsPage() {
         {/* Messages */}
         {request.message && (
           <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-900 mb-1">Message:</p>
-            <p className="text-sm text-gray-600">{request.message}</p>
+            <p className="text-sm font-medium text-foreground mb-1">Message:</p>
+            <p className="text-sm text-muted-foreground">{request.message}</p>
           </div>
         )}
 
         {request.responseMessage && (
           <div className="p-3 bg-gray-50 rounded-lg">
-            <p className="text-sm font-medium text-gray-900 mb-1">Response:</p>
-            <p className="text-sm text-gray-600">{request.responseMessage}</p>
+            <p className="text-sm font-medium text-foreground mb-1">Response:</p>
+            <p className="text-sm text-muted-foreground">{request.responseMessage}</p>
           </div>
         )}
 
@@ -367,8 +367,8 @@ export default function SwapRequestsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Plane className="w-8 h-8 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading swap requests...</p>
+          <Plane className="w-8 h-8 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading swap requests...</p>
         </div>
       </div>
     );
@@ -380,8 +380,8 @@ export default function SwapRequestsPage() {
       
       <main className="container max-w-screen-xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Swap Requests</h1>
-          <p className="text-gray-600">Manage your duty swap requests and responses</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Swap Requests</h1>
+          <p className="text-muted-foreground">Manage your duty swap requests and responses</p>
         </div>
 
         <Tabs defaultValue="received" className="space-y-6">
@@ -400,9 +400,9 @@ export default function SwapRequestsPage() {
             {receivedRequests.length === 0 ? (
               <Card>
                 <CardContent className="text-center py-12">
-                  <Inbox className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No received requests</h3>
-                  <p className="text-gray-600">
+                  <Inbox className="w-12 h-12 text-muted-foreground/70 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No received requests</h3>
+                  <p className="text-muted-foreground">
                     You haven't received any swap requests yet.
                   </p>
                 </CardContent>
@@ -420,9 +420,9 @@ export default function SwapRequestsPage() {
             {sentRequests.length === 0 ? (
               <Card>
                 <CardContent className="text-center py-12">
-                  <Send className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No sent requests</h3>
-                  <p className="text-gray-600">
+                  <Send className="w-12 h-12 text-muted-foreground/70 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-foreground mb-2">No sent requests</h3>
+                  <p className="text-muted-foreground">
                     You haven't sent any swap requests yet. Go to your dashboard to request swaps.
                   </p>
                   <Button 

@@ -111,8 +111,8 @@ export default function RosterPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Plane className="w-10 h-10 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600 text-lg font-medium">Loading Duty Roster...</p>
+          <Plane className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground text-lg font-medium">Loading Duty Roster...</p>
         </div>
       </div>
     );
@@ -143,7 +143,7 @@ export default function RosterPage() {
 
         {/* Your Duties Section */}
         <div className="sticky top-16 bg-gray-50/95 backdrop-blur-sm z-20 py-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-2 px-1">Your Schedule</h3>
+          <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Your Schedule</h3>
           <div
             ref={topScrollRef}
             className="flex overflow-x-auto space-x-4 pb-2 scrollbar-hide"
@@ -152,7 +152,7 @@ export default function RosterPage() {
           >
             {dateKeys.map(dateKey => (
               <div key={dateKey} className="w-80 flex-shrink-0">
-                <div className="text-center font-semibold text-sm text-gray-500 pb-2 border-b-2">
+                <div className="text-center font-semibold text-sm text-muted-foreground pb-2 border-b-2">
                   {format(new Date(dateKey.replace(/-/g, '/')), 'EEE dd MMM').toUpperCase()}
                 </div>
                 <div className="pt-3 h-fit">
@@ -163,8 +163,8 @@ export default function RosterPage() {
                       onSwapRequested={handleSwapRequested}
                     />
                   ) : (
-                    <div className="h-full flex items-center justify-center rounded-lg bg-gray-200/60 border-2 border-dashed">
-                      <p className="text-gray-500 font-medium">No Duty</p>
+                    <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed">
+                      <p className="text-muted-foreground font-medium">No Duty</p>
                     </div>
                   )}
                 </div>
@@ -197,7 +197,7 @@ export default function RosterPage() {
                           />
                         ))
                       ) : (
-                        <div className="h-full flex items-center justify-center text-gray-400">
+                        <div className="h-full flex items-center justify-center text-muted-foreground/70">
                           <p>No available duties</p>
                         </div>
                       )}
@@ -208,7 +208,7 @@ export default function RosterPage() {
               {dateKeys.length === 0 && !isLoading && (
                 <div className="text-center py-12 w-full flex flex-col items-center justify-center h-full">
                   <Plane className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-medium text-gray-800 mb-2">No Duties Found</h3>
+                  <h3 className="text-xl font-medium text-foreground mb-2">No Duties Found</h3>
                 </div>
               )}
             </CardContent>

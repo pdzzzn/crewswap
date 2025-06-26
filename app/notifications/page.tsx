@@ -11,12 +11,8 @@ import Header from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-}
+import { User as UserType } from '@/lib/types';
+
 
 interface Notification {
   id: string;
@@ -92,7 +88,7 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'SWAP_REQUEST_RECEIVED':
-        return <Bell className="w-5 h-5 text-blue-600" />;
+        return <Bell className="w-5 h-5 text-primary" />;
       case 'SWAP_REQUEST_APPROVED':
         return <CheckCircle className="w-5 h-5 text-green-600" />;
       case 'SWAP_REQUEST_DENIED':
@@ -100,14 +96,14 @@ export default function NotificationsPage() {
       case 'SWAP_REQUEST_CANCELLED':
         return <RefreshCw className="w-5 h-5 text-orange-600" />;
       default:
-        return <Bell className="w-5 h-5 text-gray-600" />;
+        return <Bell className="w-5 h-5 text-muted-foreground" />;
     }
   };
 
   const getNotificationBadge = (type: string) => {
     switch (type) {
       case 'SWAP_REQUEST_RECEIVED':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-300">New Request</Badge>;
+        return <Badge variant="outline" className="bg-primary/10 text-blue-700 border-blue-300">New Request</Badge>;
       case 'SWAP_REQUEST_APPROVED':
         return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Approved</Badge>;
       case 'SWAP_REQUEST_DENIED':
@@ -123,8 +119,8 @@ export default function NotificationsPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Bell className="w-8 h-8 animate-pulse mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600">Loading notifications...</p>
+          <Bell className="w-8 h-8 animate-pulse mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground">Loading notifications...</p>
         </div>
       </div>
     );
@@ -138,9 +134,9 @@ export default function NotificationsPage() {
       
       <main className="container max-w-screen-xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Notifications</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Notifications</h1>
           <div className="flex items-center gap-4">
-            <p className="text-gray-600">Stay updated on your swap requests and activity</p>
+            <p className="text-muted-foreground">Stay updated on your swap requests and activity</p>
             {unreadCount > 0 && (
               <Badge variant="destructive" className="rounded-full">
                 {unreadCount} unread
@@ -152,9 +148,9 @@ export default function NotificationsPage() {
         {notifications.length === 0 ? (
           <Card>
             <CardContent className="text-center py-12">
-              <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No notifications</h3>
-              <p className="text-gray-600">
+              <Bell className="w-12 h-12 text-muted-foreground/70 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-foreground mb-2">No notifications</h3>
+              <p className="text-muted-foreground">
                 You don't have any notifications yet. When you send or receive swap requests, they'll appear here.
               </p>
               <Button 
@@ -171,7 +167,7 @@ export default function NotificationsPage() {
               <Card 
                 key={notification.id}
                 className={`hover:shadow-md transition-all cursor-pointer ${
-                  !notification.isRead ? 'border-blue-200 bg-blue-50/30' : ''
+                  !notification.isRead ? 'border-blue-200 bg-primary/10/30' : ''
                 }`}
                 onClick={() => {
                   if (!notification.isRead) {
@@ -190,17 +186,17 @@ export default function NotificationsPage() {
                         <CardTitle className="text-lg flex items-center gap-2">
                           {notification.title}
                           {!notification.isRead && (
-                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
                           )}
                         </CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           {notification.message}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
                       {getNotificationBadge(notification.type)}
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-muted-foreground mt-2">
                         {format(new Date(notification.createdAt), 'MMM dd, HH:mm')}
                       </p>
                     </div>
@@ -209,7 +205,7 @@ export default function NotificationsPage() {
                 
                 {notification.swapRequestId && (
                   <CardContent className="pt-0">
-                    <div className="flex items-center gap-2 text-sm text-blue-600">
+                    <div className="flex items-center gap-2 text-sm text-primary">
                       <User className="w-4 h-4" />
                       <span>Click to view swap request details</span>
                     </div>

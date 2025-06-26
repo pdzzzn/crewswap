@@ -57,7 +57,7 @@ export default function DutyCard({
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-shadow duration-200 bg-white border border-gray-200">
+      <Card className="hover:shadow-lg transition-shadow duration-200 bg-card border">
         {/* Conditional Delete Button */}
         {onDelete && (
           <Button
@@ -72,14 +72,14 @@ export default function DutyCard({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Plane className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-primary/20 rounded-lg">
+                <Plane className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <CardTitle className="text-lg font-bold text-blue-600">
+                <CardTitle className="text-lg font-bold text-primary">
                   {duty.flightNumber}
                 </CardTitle>
-                <p className="text-sm text-gray-500">{getDayOfWeek(duty.date)}</p>
+                <p className="text-sm text-muted-foreground">{getDayOfWeek(duty.date)}</p>
               </div>
             </div>
             <Badge variant="outline" className="text-sm">
@@ -92,26 +92,26 @@ export default function DutyCard({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-lg font-bold text-foreground">
                   {formatTime(duty.departureTime)}
                 </p>
-                <p className="text-sm text-gray-500 font-medium">
+                <p className="text-sm text-muted-foreground font-medium">
                   {duty.departureLocation}
                 </p>
               </div>
 
               <div className="flex flex-col items-center gap-1 px-3">
-                <ArrowRight className="w-4 h-4 text-gray-400" />
-                <p className="text-xs text-gray-500">
+                <ArrowRight className="w-4 h-4 text-muted-foreground/70" />
+                <p className="text-xs text-muted-foreground">
                   {calculateDuration(duty.departureTime, duty.arrivalTime)}
                 </p>
               </div>
 
               <div className="text-center">
-                <p className="text-lg font-bold text-gray-900">
+                <p className="text-lg font-bold text-foreground">
                   {formatTime(duty.arrivalTime)}
                 </p>
-                <p className="text-sm text-gray-500 font-medium">
+                <p className="text-sm text-muted-foreground font-medium">
                   {duty.arrivalLocation}
                 </p>
               </div>
@@ -119,8 +119,8 @@ export default function DutyCard({
           </div>
 
           <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
-            <Clock className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600">
+            <Clock className="w-4 h-4 text-muted-foreground/70" />
+            <span className="text-sm text-muted-foreground">
               Duration: {calculateDuration(duty.departureTime, duty.arrivalTime)}
             </span>
           </div>

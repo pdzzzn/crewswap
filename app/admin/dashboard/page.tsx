@@ -57,10 +57,10 @@ export default function AdminDashboardPage() {
   // Display a loading state while verifying admin status
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
-          <ShieldCheck className="w-10 h-10 animate-spin mx-auto mb-4 text-blue-600" />
-          <p className="text-gray-600 font-medium">Verifying admin access...</p>
+          <ShieldCheck className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground font-medium">Verifying admin access...</p>
         </div>
       </div>
     );
@@ -68,11 +68,11 @@ export default function AdminDashboardPage() {
 
   // Render the admin dashboard for authorized users
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header user={user} />
       <main className="container max-w-screen-xl mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Admin Dashboard
           </h1>
           <p className="text-muted-foreground">
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-8 p-6 rounded-lg text-center">
+        <div className="mt-8 p-6 rounded-lg text-center ">
           <SidebarProvider
             style={
               {
@@ -147,7 +147,7 @@ export default function AdminDashboardPage() {
                 <div className="@container/main flex flex-1 flex-col gap-2">
                   <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                     <SectionCards />
-                    <div className="px-4 lg:px-6">
+                    <div className="px-4 lg:px-6 ">
                       <ChartAreaInteractive />
                     </div>
                     <DataTable data={data} />

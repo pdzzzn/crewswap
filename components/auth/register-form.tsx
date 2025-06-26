@@ -81,11 +81,11 @@ export default function RegisterForm() {
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-blue-600 rounded-full">
+            <div className="p-3 bg-primary rounded-full">
               <Plane className="w-8 h-8 text-white" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-gray-900">Join Our Crew</CardTitle>
+          <CardTitle className="text-2xl font-bold text-foreground">Join Our Crew</CardTitle>
           <CardDescription>Create your aviation crew account</CardDescription>
         </CardHeader>
         <CardContent>
@@ -165,18 +165,18 @@ export default function RegisterForm() {
             </div>
             <Button 
               type="submit" 
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-primary hover:bg-primary/90"
               disabled={isLoading}
             >
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
           <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
               <Button
                 variant="link"
-                className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                className="p-0 h-auto text-primary hover:text-blue-700"
                 onClick={() => router.push('/login')}
               >
                 Sign in here
