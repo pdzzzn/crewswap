@@ -77,12 +77,12 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <Card className="w-full max-w-md shadow-lg">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 px-4">
+      <Card className="w-full max-w-md shadow-lg border-2 border-primary/20">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <div className="p-3 bg-primary rounded-full">
-              <Plane className="w-8 h-8 text-white" />
+              <Plane className="w-8 h-8 text-secondary" />
             </div>
           </div>
           <CardTitle className="text-2xl font-bold text-foreground">Join Our Crew</CardTitle>
@@ -176,7 +176,7 @@ export default function RegisterForm() {
               Already have an account?{' '}
               <Button
                 variant="link"
-                className="p-0 h-auto text-primary hover:text-blue-700"
+                className="p-0 h-auto text-primary hover:text-secondary"
                 onClick={() => router.push('/login')}
               >
                 Sign in here

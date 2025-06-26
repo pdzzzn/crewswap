@@ -5,13 +5,13 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Bell, CheckCircle, XCircle, RefreshCw, User } from 'lucide-react';
+import { Bell, CheckCircle, XCircle, RefreshCw, User as Userbadge } from 'lucide-react';
 import { format } from 'date-fns';
 import Header from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 
-import { User as UserType } from '@/lib/types';
+import { User} from '@/lib/types';
 
 
 interface Notification {
@@ -90,11 +90,11 @@ export default function NotificationsPage() {
       case 'SWAP_REQUEST_RECEIVED':
         return <Bell className="w-5 h-5 text-primary" />;
       case 'SWAP_REQUEST_APPROVED':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5 text-success" />;
       case 'SWAP_REQUEST_DENIED':
-        return <XCircle className="w-5 h-5 text-red-600" />;
+        return <XCircle className="w-5 h-5 text-error" />;
       case 'SWAP_REQUEST_CANCELLED':
-        return <RefreshCw className="w-5 h-5 text-orange-600" />;
+        return <RefreshCw className="w-5 h-5 text-warning" />;
       default:
         return <Bell className="w-5 h-5 text-muted-foreground" />;
     }
@@ -103,13 +103,13 @@ export default function NotificationsPage() {
   const getNotificationBadge = (type: string) => {
     switch (type) {
       case 'SWAP_REQUEST_RECEIVED':
-        return <Badge variant="outline" className="bg-primary/10 text-blue-700 border-blue-300">New Request</Badge>;
+        return <Badge variant="outline" className="bg-info-light text-info border-info/30">New Request</Badge>;
       case 'SWAP_REQUEST_APPROVED':
-        return <Badge variant="outline" className="bg-green-50 text-green-700 border-green-300">Approved</Badge>;
+        return <Badge variant="outline" className="bg-success-light text-success border-success/30">Approved</Badge>;
       case 'SWAP_REQUEST_DENIED':
-        return <Badge variant="outline" className="bg-red-50 text-red-700 border-red-300">Denied</Badge>;
+        return <Badge variant="outline" className="bg-error-light text-error border-error/30">Denied</Badge>;
       case 'SWAP_REQUEST_CANCELLED':
-        return <Badge variant="outline" className="bg-orange-50 text-orange-700 border-orange-300">Cancelled</Badge>;
+        return <Badge variant="outline" className="bg-warning-light text-warning border-warning/30">Cancelled</Badge>;
       default:
         return <Badge variant="outline">Notification</Badge>;
     }
@@ -129,7 +129,7 @@ export default function NotificationsPage() {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header user={user} />
       
       <main className="container max-w-screen-xl mx-auto px-4 py-8">
@@ -167,7 +167,7 @@ export default function NotificationsPage() {
               <Card 
                 key={notification.id}
                 className={`hover:shadow-md transition-all cursor-pointer ${
-                  !notification.isRead ? 'border-blue-200 bg-primary/10/30' : ''
+                  !notification.isRead ? 'border-primary/30 bg-primary/5' : ''
                 }`}
                 onClick={() => {
                   if (!notification.isRead) {
@@ -206,7 +206,7 @@ export default function NotificationsPage() {
                 {notification.swapRequestId && (
                   <CardContent className="pt-0">
                     <div className="flex items-center gap-2 text-sm text-primary">
-                      <User className="w-4 h-4" />
+                      <Userbadge className="w-4 h-4" />
                       <span>Click to view swap request details</span>
                     </div>
                   </CardContent>

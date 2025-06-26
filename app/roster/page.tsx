@@ -109,7 +109,7 @@ export default function RosterPage() {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <Plane className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground text-lg font-medium">Loading Duty Roster...</p>
@@ -121,7 +121,7 @@ export default function RosterPage() {
   const dateKeys = Array.from(groupedDuties.keys());
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header user={user} />
 
       <main className="container max-w-screen-xl mx-auto px-4 py-8 flex-1 flex flex-col">
@@ -142,7 +142,7 @@ export default function RosterPage() {
         </CardHeader>
 
         {/* Your Duties Section */}
-        <div className="sticky top-16 bg-gray-50/95 backdrop-blur-sm z-20 py-4">
+        <div className="sticky top-16 bg-background/95 backdrop-blur-sm z-20 py-4">
           <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Your Schedule</h3>
           <div
             ref={topScrollRef}
@@ -152,7 +152,7 @@ export default function RosterPage() {
           >
             {dateKeys.map(dateKey => (
               <div key={dateKey} className="w-80 flex-shrink-0">
-                <div className="text-center font-semibold text-sm text-muted-foreground pb-2 border-b-2">
+                <div className="text-center font-semibold text-sm text-muted-foreground pb-2 border-b-2 ">
                   {format(new Date(dateKey.replace(/-/g, '/')), 'EEE dd MMM').toUpperCase()}
                 </div>
                 <div className="pt-3 h-fit">
@@ -163,7 +163,7 @@ export default function RosterPage() {
                       onSwapRequested={handleSwapRequested}
                     />
                   ) : (
-                    <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed">
+                    <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground">
                       <p className="text-muted-foreground font-medium">No Duty</p>
                     </div>
                   )}
@@ -177,14 +177,15 @@ export default function RosterPage() {
 
         {/* Available Duties Section */}
         <div className="flex-1 flex flex-col min-h-0">
-          <Card className="flex-1 flex flex-col">
+          <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Available Swaps</h3>
+          <Card className="flex-1 flex flex-col border-2 border-border rounded-lg bg-background">
             <CardContent
               ref={bottomScrollRef}
               className="flex-1 overflow-x-auto scrollbar-hide p-0"
               onScroll={() => handleScroll('bottom')}
               onMouseEnter={() => scrollSyncRef.current = 'bottom'}
             >
-              <div className="flex space-x-4 h-full">
+              <div className="flex space-x-4 h-full bg-background/95 backdrop-blur-sm">
                 {dateKeys.map(dateKey => (
                   <div key={dateKey} className="w-80 flex-shrink-0 h-full flex flex-col">
                     <div className="flex-1 overflow-y-auto space-y-3 pr-2" style={{ paddingRight: '2px' }}>
@@ -207,7 +208,7 @@ export default function RosterPage() {
               </div>
               {dateKeys.length === 0 && !isLoading && (
                 <div className="text-center py-12 w-full flex flex-col items-center justify-center h-full">
-                  <Plane className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                  <Plane className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
                   <h3 className="text-xl font-medium text-foreground mb-2">No Duties Found</h3>
                 </div>
               )}

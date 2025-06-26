@@ -120,7 +120,7 @@ export default function AdminDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Site Status</CardTitle>
-              <ShieldCheck className="h-4 w-4 text-green-500" />
+              <ShieldCheck className="h-4 w-4 text-success" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">Operational</div>
@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-8 p-6 rounded-lg text-center ">
+        <div className="mt-8 p-6 rounded-lg text-center">
           <SidebarProvider
             style={
               {
@@ -147,7 +147,7 @@ export default function AdminDashboardPage() {
                 <div className="@container/main flex flex-1 flex-col gap-2">
                   <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
                     <SectionCards />
-                    <div className="px-4 lg:px-6 ">
+                    <div className="px-4 lg:px-6">
                       <ChartAreaInteractive />
                     </div>
                     <DataTable data={data} />

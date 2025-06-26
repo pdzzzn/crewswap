@@ -60,7 +60,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl h-[70vh] flex flex-col">
+            <DialogContent className="max-w-4xl h-[70vh] flex flex-col bg-background">
                 <DialogHeader>
                     <DialogTitle>Stage Duties for Upload</DialogTitle>
                     <DialogDescription>

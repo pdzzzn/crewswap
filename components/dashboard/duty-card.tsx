@@ -57,7 +57,7 @@ export default function DutyCard({
 
   return (
     <>
-      <Card className="hover:shadow-lg transition-shadow duration-200 bg-card border">
+      <Card className="hover:shadow-lg transition-shadow duration-200 bg-card border-2 border-border">
         {/* Conditional Delete Button */}
         {onDelete && (
           <Button
@@ -118,7 +118,7 @@ export default function DutyCard({
             </div>
           </div>
 
-          <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+          <div className="flex gap-2 pt-2 border-t border-border">
             <Clock className="w-4 h-4 text-muted-foreground/70" />
             <span className="text-sm text-muted-foreground">
               Duration: {calculateDuration(duty.departureTime, duty.arrivalTime)}
