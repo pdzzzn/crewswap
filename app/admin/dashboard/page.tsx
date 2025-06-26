@@ -131,7 +131,7 @@ export default function AdminDashboardPage() {
           </Card>
         </div>
 
-        <div className="mt-8 bg-blue-50 border border-blue-200 text-blue-800 p-6 rounded-lg text-center">
+        <div className="mt-8 p-6 rounded-lg text-center">
           <SidebarProvider
             style={
               {
