@@ -3,20 +3,81 @@ Whats next:
 [✔]1. Update duty modal: 
     - Auto close datepicker after date selection
     - Manual date entry
-[ ]2. Insert Duties from Modal into database
-[ ]3. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
-[ ]4. Add filters to roster page 
+
+[ ]2. Change the duty structure:
+    [ ] - Instead of flat hierarchy, create a "Duty pairing" structure. Check below!!
+    [ ] - Update duty Modal to allow entry of multiple legs.
+    [ ] - Update duty Modal to allow "linking" of duties, that have to be swapped together.
+
+[ ]3. Insert Duties from Modal into database
+
+[ ]4. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
+[ ]5. Add filters to roster page 
     - Filter by Departure Location
     - Arrival Location
+    - Layover or not layover.
 
-What am I currently doing: 
+
+
+
+To be done later: 
 [✔] 1. Adding admin role with admin dashboard permissions   
-[ ] 2. Creating an admin dashboard ( preferably check shadcnui dashboard example)
+[✔] 2. Creating an admin dashboard ( preferably check shadcnui dashboard example)
+    [ ]- Add functionality to admin dashboard. 
+    [ ]- Add user management to admin dashboard. 
+    [ ]- Add duty management to admin dashboard. 
+    [ ]- Add debug log viewer. 
+[ ] 3. Add layover designator to roster page. 
+    [ ] - Roster page will have layovers marked with a line like in regular roster.
+
+[ ] 4. Add roster parser python script to site. 
+    [ ] - Script will parse a roster file and insert the duties into the duty modal. 
+        [ ] - A select duty modal will be opened for each duty that should be added to the staging modal.
+            [ ] - A list view of the duties is ideal initially. 
+
+    
+
+X. At some point add a function to only swap multiple duties at once.
+    I.e. only mark a full layover as swappable.
+    Some sort of linking of duties will be necessary. 
 
 
 
-X. At some point add a function to only swap multiple duties at once. Some sort of linking of duties will be necessary. 
 
+Duty Pairing structure:
+{
+  "id": "pairing456",
+  "pairingId": "P456", // Or some other identifier for the whole trip
+  "startDate": "2025-07-15",
+  "endDate": "2025-07-17",
+  "totalDuration": "48h 30m",
+  "legs": [
+    {
+      "id": "leg1",
+      "flightNumber": "BA2490",
+      "date": "2025-07-15",
+      "departureTime": "2025-07-15T09:00:00Z",
+      "arrivalTime": "2025-07-15T11:30:00Z",
+      "departureLocation": "LHR",
+      "arrivalLocation": "FCO"
+    },
+    {
+      "id": "layover1",
+      "type": "layover", // You can explicitly define layovers
+      "location": "FCO",
+      "duration": "26h 0m"
+    },
+    {
+      "id": "leg2",
+      "flightNumber": "BA2491",
+      "date": "2025-07-16",
+      "departureTime": "2025-07-16T13:30:00Z",
+      "arrivalTime": "2025-07-16T15:00:00Z",
+      "departureLocation": "FCO",
+      "arrivalLocation": "LHR"
+    }
+  ]
+}
 
 Claude Opus Suggestions: 
 # CrewSwap UX Improvement Tasks

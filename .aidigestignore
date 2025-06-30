@@ -9,3 +9,5 @@ themeerror.md
 README.md
 GEMINI.md
 components/ui/
+.yarnrc.yml
+.vscode/settings.json
