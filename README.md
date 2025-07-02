@@ -12,7 +12,7 @@ Whats next:
 [ ]3. Insert Duties from Modal into database
 
 [ ]4. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
-[ ]5. Add filters to roster page 
+[ ]5. Add filters to roster page yarn 
     - Filter by Departure Location
     - Arrival Location
     - Layover or not layover.
@@ -42,6 +42,7 @@ X. At some point add a function to only swap multiple duties at once.
     Some sort of linking of duties will be necessary. 
 
 
+XX. Translate parser from python to TypeScript.
 
 
 Duty Pairing structure:
