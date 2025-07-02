@@ -10,13 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plane, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { roles } from '@/lib/types';
 
-const roles = [
-  { value: 'CAPTAIN', label: 'Captain' },
-  { value: 'FIRST_OFFICER', label: 'First Officer' },
-  { value: 'PURSER', label: 'Purser' },
-  { value: 'CABIN_ATTENDANT', label: 'Cabin Attendant' },
-];
 
 const bases = [
   { value: 'PMI', label: 'Palma de Mallorca (PMI)' },
