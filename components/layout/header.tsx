@@ -89,7 +89,7 @@ export default function Header({ user }: HeaderProps) {
             <Button key={adminLink.href} variant="ghost" asChild>
               <Link
                 href={adminLink.href}
-                className="text-muted-foreground transition-colors hover:text-foreground font-bold text-primary"
+                className="transition-colors hover:text-foreground font-bold text-primary"
               >
                 {adminLink.label}
               </Link>

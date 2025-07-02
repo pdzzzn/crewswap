@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Calendar, Plane, Users } from 'lucide-react';
+import { Calendar, Plane } from 'lucide-react';
 import Header from '@/components/layout/header';
 import DutyCard from '@/components/dashboard/duty-card';
 import { useRouter } from 'next/navigation';

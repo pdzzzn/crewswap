@@ -16,11 +16,7 @@ import { SectionCards } from "@/components/section-cards";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
-
-
-import data from "./data.json"
-
-
+import data from "./data.json";
 
 export default function AdminDashboardPage() {
   const [user, setUser] = useState<User | null>(null);
@@ -60,7 +56,9 @@ export default function AdminDashboardPage() {
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <ShieldCheck className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground font-medium">Verifying admin access...</p>
+          <p className="text-muted-foreground font-medium">
+            Verifying admin access...
+          </p>
         </div>
       </div>
     );
@@ -69,95 +67,95 @@ export default function AdminDashboardPage() {
   // Render the admin dashboard for authorized users
   return (
     <div className="min-h-screen bg-background">
-      <Header user={user} />
-      <main className="container max-w-screen-xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Admin Dashboard
-          </h1>
-          <p className="text-muted-foreground">
-            Welcome, {user.name}. You have administrator privileges.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">142</div>
-              <p className="text-xs text-muted-foreground">+5 new this month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Total Duties
-              </CardTitle>
-              <Plane className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">1,234</div>
-              <p className="text-xs text-muted-foreground">+120 this month</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                Active Swaps
-              </CardTitle>
-              <BarChart3 className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">89</div>
-              <p className="text-xs text-muted-foreground">
-                Awaiting resolution
+      <SidebarProvider
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as React.CSSProperties
+        }
+      >
+        <AppSidebar variant="floating" />
+        <SidebarInset>
+          <Header user={user} />
+          <main className="container max-w-screen-xl mx-auto px-4 py-8">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Admin Dashboard
+              </h1>
+              <p className="text-muted-foreground">
+                Welcome, {user.name}. You have administrator privileges.
               </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Site Status</CardTitle>
-              <ShieldCheck className="h-4 w-4 text-success" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">Operational</div>
-              <p className="text-xs text-muted-foreground">
-                All systems are normal
-              </p>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
 
-        <div className="mt-8 p-6 rounded-lg text-center">
-          <SidebarProvider
-            style={
-              {
-                "--sidebar-width": "calc(var(--spacing) * 72)",
-                "--header-height": "calc(var(--spacing) * 12)",
-              } as React.CSSProperties
-            }
-          >
-            <AppSidebar variant="inset" />
-            <SidebarInset>
-              <SiteHeader />
-              <div className="flex flex-1 flex-col">
-                <div className="@container/main flex flex-1 flex-col gap-2">
-                  <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-                    <SectionCards />
-                    <div className="px-4 lg:px-6">
-                      <ChartAreaInteractive />
-                    </div>
-                    <DataTable data={data} />
-                  </div>
-                </div>
-              </div>
-            </SidebarInset>
-          </SidebarProvider>
-        </div>
-      </main>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Users
+                  </CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">142</div>
+                  <p className="text-xs text-muted-foreground">
+                    +5 new this month
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Total Duties
+                  </CardTitle>
+                  <Plane className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">1,234</div>
+                  <p className="text-xs text-muted-foreground">
+                    +120 this month
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Active Swaps
+                  </CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">89</div>
+                  <p className="text-xs text-muted-foreground">
+                    Awaiting resolution
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    Site Status
+                  </CardTitle>
+                  <ShieldCheck className="h-4 w-4 text-success" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">Operational</div>
+                  <p className="text-xs text-muted-foreground">
+                    All systems are normal
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="mt-8">
+              {/* Your other components like charts and tables can go here */}
+              {/* For example: */}
+              <ChartAreaInteractive />
+              <DataTable data={data} />
+            </div>
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
     </div>
   );
 }
