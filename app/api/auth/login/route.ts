@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Generate token and set cookie
     const token = generateToken({ userId: user.id });
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     cookieStore.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
