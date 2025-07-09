@@ -7,6 +7,7 @@ codebase.md
 app/admin/dashboard/data.json
 themeerror.md
 README.md
+*.md
 GEMINI.md
 components/ui/
 .yarnrc.yml

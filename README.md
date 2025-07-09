@@ -11,8 +11,8 @@ Whats next:
 
 [ ]3. Insert Duties from Modal into database
 
-[ ]4. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
-[ ]5. Add filters to roster page yarn 
+[✔]4. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
+[ ]5. Add filters to roster page 
     - Filter by Departure Location
     - Arrival Location
     - Layover or not layover.
