@@ -73,6 +73,9 @@ export default function RosterPage() {
     }
   }, [user]);
 
+
+
+
   // Memoized client-side filtering of available duties based on the selected role
   const filteredAvailableDuties = useMemo(() => {
     if (selectedRole === 'allDuties' || !selectedRole) {
@@ -80,6 +83,31 @@ export default function RosterPage() {
     }
     return availableDuties.filter(duty => duty.user?.role === selectedRole);
   }, [availableDuties, selectedRole]);
+
+  // NEW: Memoized grouping of available duties by user, then by date.
+  const dutiesByUser = useMemo(() => {
+    const grouped = new Map<string, Map<string, Duty>>();
+
+    filteredAvailableDuties.forEach(duty => {
+      // Ensure the duty has a user and a user ID.
+      if (!duty.user || !duty.user.id) {
+        return;
+      }
+
+      const userId = duty.user.id;
+      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
+
+      // If we haven't seen this user before, create a new map for them.
+      if (!grouped.has(userId)) {
+        grouped.set(userId, new Map<string, Duty>());
+      }
+
+      // Add the duty to the user's personal schedule map.
+      grouped.get(userId)!.set(dateKey, duty);
+    });
+
+    return grouped;
+  }, [filteredAvailableDuties]); // This recalculates only when the filtered duties change.
 
   // Memoized grouping of duties for rendering, recalculated when filtered duties change
   const groupedDuties = useMemo(() => {
@@ -192,7 +220,7 @@ export default function RosterPage() {
         </CardHeader>
 
         {/* Your Duties Section */}
-        <div className="sticky top-16 bg-background/95 backdrop-blur-sm z-20 py-4">
+        <div className="sticky top-16 bg-background/10 backdrop-blur-none z-20 py-4">
           <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Your Schedule</h3>
           <div
             ref={topScrollRef}
@@ -216,7 +244,7 @@ export default function RosterPage() {
                 <div className="text-center font-semibold text-sm text-muted-foreground pb-2 border-b-2 ">
                   {format(new Date(dateKey.replace(/-/g, '/')), 'EEE dd MMM').toUpperCase()}
                 </div>
-                <div className="pt-3 h-fit">
+                <div className="pt-3 pl-1 h-fit">
                   {groupedDuties.get(dateKey)?.userDuty ? (
                     <DutyCard
                       duty={groupedDuties.get(dateKey)!.userDuty!}
@@ -237,41 +265,61 @@ export default function RosterPage() {
         <Separator className="my-6" />
 
         {/* Available Duties Section */}
+        {/* --- MODIFIED: Available Duties Section --- */}
         <div className="flex-1 flex flex-col min-h-0">
           <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Available Swaps</h3>
-          <Card className="flex-1 flex flex-col border-2 border-border rounded-lg bg-background" style={{ paddingTop: '0px' }}>
+          <Card className="flex-1 flex flex-col border-2 border-border rounded-lg overflow-hidden">
             <CardContent
               ref={bottomScrollRef}
-              className="flex-1 overflow-x-auto scrollbar-hide p-0"
+              className="flex-1 overflow-x-auto h-full overflow-auto scrollbar-hide p-0 bg-background" style={{ paddingTop: '0', paddingLeft: '-10px' }}
               onScroll={() => handleScroll('bottom')}
               onMouseEnter={() => scrollSyncRef.current = 'bottom'}
             >
-              <div className="flex space-x-4 h-full bg-background/95 backdrop-blur-sm">
-                {dateKeys.map(dateKey => (
-                  <div key={dateKey} className="w-80 flex-shrink-0 h-full flex flex-col">
-                    <div className="flex-1 overflow-y-auto space-y-3 pr-2" style={{ paddingRight: '2px' }}>
-                      {groupedDuties.get(dateKey)!.availableDuties.length > 0 ? (
-                        groupedDuties.get(dateKey)!.availableDuties.map(duty => (
-                          <DutyCard
-                            key={duty.id}
-                            duty={duty}
-                            onSwapRequested={handleSwapRequested}
-                          />
-                        ))
-                      ) : (
-                        <div className="h-full flex items-center justify-center text-muted-foreground/70">
-                          <p>No available duties</p>
-                        </div>
-                      )}
+              <div className="space-y-4">
+                {/* Loop over each USER to create a row */}
+                {Array.from(dutiesByUser.keys()).map(userId => {
+                  const userDutiesMap = dutiesByUser.get(userId)!;
+                  // Get the first duty to display the user's name
+                  const representativeDuty = userDutiesMap.values().next().value;
+
+                  return (
+                    <div key={userId}>
+                      {/* Optional: Add a header for each user's row */}
+                      <h4 className="text-md font-semibold text-foreground mb-2">
+                        {representativeDuty?.user?.name || `User ${userId}`}
+                      </h4>
+
+                      {/* This flex container is the USER'S ROW */}
+                      <div className="flex space-x-4">
+                        {/* Loop over each DATE to create a column */}
+                        {dateKeys.map(dateKey => (
+                          <div key={dateKey} className="w-80 flex-shrink-0">
+                            {userDutiesMap.has(dateKey) ? (
+                              // If the user has a duty on this date, show it
+                              <DutyCard
+                                duty={userDutiesMap.get(dateKey)!}
+                                onSwapRequested={handleSwapRequested}
+                              />
+                            ) : (
+                              // Otherwise, show a placeholder to keep alignment
+                              <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground min-h-[100px]">
+                              <p className="text-muted-foreground font-medium">No Duty</p>
+                            </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-              {dateKeys.length === 0 && (
+
+              {/* Placeholder for when no duties match the filter */}
+              {dutiesByUser.size === 0 && (
                 <div className="text-center py-12 w-full flex flex-col items-center justify-center h-full">
                   <Plane className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
                   <h3 className="text-xl font-medium text-foreground mb-2">No Duties Found</h3>
-                  <p className="text-muted-foreground">There are no duties matching your filter.</p>
+                  <p className="text-muted-foreground">There are no available duties matching your filter.</p>
                 </div>
               )}
             </CardContent>
