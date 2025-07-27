@@ -10,10 +10,10 @@ import {
     DialogDescription,
     DialogFooter,
 } from '@/components/ui/dialog';
-import { PlusCircle, Plane, UploadCloud, FileText, X } from 'lucide-react';
+import { PlusCircle, Plane, UploadCloud, FileText, X, Loader2, List } from 'lucide-react';
 import DutyCard from '@/components/dashboard/duty-card';
 import { AddDutyForm } from './add-duty-form';
-import type { Duty } from '@/lib/types'; // Assuming Duty type is in a central file
+import type { Duty, FlightLeg } from '@/lib/types';
 
 interface DutyStagingModalProps {
     isOpen: boolean;
@@ -28,21 +28,90 @@ const combineDateTime = (date: Date, time: string): string => {
     return newDate.toISOString();
 };
 
+// Type for parsed duties from the backend
+interface ParsedDuty {
+    id: string;
+    date: string;
+    flightNumber: string;
+    departureTime: string;
+    arrivalTime: string;
+    departureLocation: string;
+    arrivalLocation: string;
+}
 
 export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
     const [stagedDuties, setStagedDuties] = useState<Duty[]>([]);
     const [isAddFormOpen, setIsAddFormOpen] = useState(false);
     const [pdfFile, setPdfFile] = useState<File | null>(null);
     const [isDragging, setIsDragging] = useState(false);
+    const [isParsing, setIsParsing] = useState(false);
+    const [parseError, setParseError] = useState<string | null>(null);
+    const [showOverview, setShowOverview] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
 
     const handleFileSelect = (files: FileList | null) => {
         if (files && files[0] && files[0].type === "application/pdf") {
             setPdfFile(files[0]);
-            // TODO: Implement PDF parsing logic here and populate stagedDuties
-            // For example: `parsePdfAndSetDuties(files[0]);`
-            console.log("PDF file selected:", files[0]);
+            setParseError(null);
+            // Automatically parse the PDF when selected
+            parsePdfAndSetDuties(files[0]);
+        }
+    };
+
+    const parsePdfAndSetDuties = async (file: File) => {
+        setIsParsing(true);
+        setParseError(null);
+        
+        try {
+            const formData = new FormData();
+            formData.append('pdfFile', file);
+            
+            const response = await fetch('/api/convert-roster', {
+                method: 'POST',
+                body: formData,
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to parse PDF');
+            }
+            
+            // Handle the JSON response from the backend
+            const result = await response.json();
+            
+            // Convert parsed duties to Duty objects
+            const duties: Duty[] = result.duties.map((parsedDuty: ParsedDuty, index: number) => {
+                // Create a FlightLeg from the parsed duty data
+                const flightLeg: FlightLeg = {
+                    id: `leg-${index}`,
+                    flightNumber: parsedDuty.flightNumber,
+                    departureTime: parsedDuty.departureTime,
+                    arrivalTime: parsedDuty.arrivalTime,
+                    departureLocation: parsedDuty.departureLocation,
+                    arrivalLocation: parsedDuty.arrivalLocation,
+                    isDeadhead: false,
+                };
+                
+                // Create a Duty object
+                return {
+                    id: parsedDuty.id,
+                    date: parsedDuty.date,
+                    legs: [flightLeg],
+                    pairing: null,
+                };
+            });
+            
+            // Update the stagedDuties state
+            setStagedDuties(duties);
+            
+            console.log(`Successfully parsed ${duties.length} duties from PDF`);
+            
+        } catch (error: any) {
+            console.error('Error parsing PDF:', error);
+            setParseError(error.message || 'Failed to parse PDF');
+        } finally {
+            setIsParsing(false);
         }
     };
 
@@ -73,12 +142,17 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
     const handleAddDuty = (formData: any) => {
         const newDuty: Duty = {
             id: `staged-${stagedDuties.length + 1}`, // Temporary ID
-            flightNumber: formData.flightNumber,
             date: formData.date.toISOString(),
-            departureTime: combineDateTime(formData.date, formData.departureTime),
-            arrivalTime: combineDateTime(formData.date, formData.arrivalTime),
-            departureLocation: formData.departureLocation,
-            arrivalLocation: formData.arrivalLocation,
+            legs: [{
+                id: `leg-${stagedDuties.length + 1}-1`,
+                flightNumber: formData.flightNumber,
+                departureTime: combineDateTime(formData.date, formData.departureTime),
+                arrivalTime: combineDateTime(formData.date, formData.arrivalTime),
+                departureLocation: formData.departureLocation,
+                arrivalLocation: formData.arrivalLocation,
+                isDeadhead: false,
+            }],
+            pairing: null,
         };
         setStagedDuties(prev => [...prev, newDuty]);
         setIsAddFormOpen(false); // Close the form modal after adding
@@ -95,10 +169,43 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
 
     const clearFile = () => {
         setPdfFile(null);
+        setParseError(null);
+        // Clear staged duties when file is cleared
+        setStagedDuties([]);
+        setShowOverview(false);
         if(fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     }
+
+    // Calculate overview statistics
+    const getOverviewStats = () => {
+        const totalDuties = stagedDuties.length;
+        const totalLegs = stagedDuties.reduce((acc, duty) => acc + duty.legs.length, 0);
+        
+        // Get unique destinations
+        const destinations = new Set<string>();
+        stagedDuties.forEach(duty => {
+            duty.legs.forEach(leg => {
+                destinations.add(leg.departureLocation);
+                destinations.add(leg.arrivalLocation);
+            });
+        });
+        
+        // Get date range
+        const dates = stagedDuties.map(duty => new Date(duty.date));
+        const minDate = dates.length > 0 ? new Date(Math.min(...dates as any)) : null;
+        const maxDate = dates.length > 0 ? new Date(Math.max(...dates as any)) : null;
+        
+        return {
+            totalDuties,
+            totalLegs,
+            uniqueDestinations: destinations.size,
+            dateRange: minDate && maxDate ? `${minDate.toLocaleDateString()} - ${maxDate.toLocaleDateString()}` : 'N/A'
+        };
+    };
+
+    const overviewStats = getOverviewStats();
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -125,11 +232,35 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                         accept="application/pdf"
                         onChange={(e) => handleFileSelect(e.target.files)}
                     />
-                    {pdfFile ? (
+                    {isParsing ? (
+                        <div className="flex flex-col items-center justify-center text-foreground">
+                            <Loader2 className="w-12 h-12 mb-4 text-primary animate-spin" />
+                            <p className="font-semibold">Parsing your PDF roster...</p>
+                            <p className="text-sm text-muted-foreground">This may take a moment</p>
+                        </div>
+                    ) : pdfFile ? (
                         <div className="flex flex-col items-center justify-center text-foreground">
                              <FileText className="w-12 h-12 mb-4 text-primary" />
                              <p className="font-semibold">{pdfFile.name}</p>
                              <p className="text-sm text-muted-foreground">({(pdfFile.size / 1024).toFixed(2)} KB)</p>
+                             {parseError ? (
+                                <p className="text-sm text-red-500 mt-2">Error: {parseError}</p>
+                             ) : (
+                                <div className="flex flex-col items-center mt-2">
+                                    <p className="text-sm text-green-500">Successfully parsed {stagedDuties.length} duties!</p>
+                                    {stagedDuties.length > 0 && (
+                                        <Button 
+                                            variant="outline" 
+                                            size="sm" 
+                                            className="mt-2"
+                                            onClick={(e) => { e.stopPropagation(); setShowOverview(!showOverview); }}
+                                        >
+                                            <List className="w-4 h-4 mr-2" />
+                                            {showOverview ? 'Hide Overview' : 'Show Overview'}
+                                        </Button>
+                                    )}
+                                </div>
+                             )}
                              <Button
                                  variant="ghost"
                                  size="sm"
@@ -148,6 +279,33 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                     )}
                 </div>
 
+                {/* Overview Section */}
+                {showOverview && stagedDuties.length > 0 && (
+                    <div className="border rounded-md p-4 mb-4 bg-muted/50">
+                        <h3 className="font-semibold text-lg mb-2 flex items-center">
+                            <List className="w-5 h-5 mr-2" />
+                            Duty Overview
+                        </h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-background p-3 rounded-md border">
+                                <p className="text-sm text-muted-foreground">Total Duties</p>
+                                <p className="text-2xl font-bold">{overviewStats.totalDuties}</p>
+                            </div>
+                            <div className="bg-background p-3 rounded-md border">
+                                <p className="text-sm text-muted-foreground">Total Legs</p>
+                                <p className="text-2xl font-bold">{overviewStats.totalLegs}</p>
+                            </div>
+                            <div className="bg-background p-3 rounded-md border">
+                                <p className="text-sm text-muted-foreground">Destinations</p>
+                                <p className="text-2xl font-bold">{overviewStats.uniqueDestinations}</p>
+                            </div>
+                            <div className="bg-background p-3 rounded-md border">
+                                <p className="text-sm text-muted-foreground">Date Range</p>
+                                <p className="text-lg font-bold">{overviewStats.dateRange}</p>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                  {/* Separator */}
                 <div className="flex items-center my-4">
@@ -160,8 +318,8 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                     {stagedDuties.length === 0 ? (
                         <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                             <Plane className="w-16 h-16 mb-4" />
-                            <p className="font-semibold text-foreground">Click "Add Single Duty" to get started.</p>
-                            <p className="text-sm text-muted-foreground">No duties have been added manually.</p>                           
+                            <p className="font-semibold text-foreground">{pdfFile ? 'No duties were parsed from the PDF.' : 'Click "Add Single Duty" to get started.'}</p>
+                            <p className="text-sm text-muted-foreground">{pdfFile ? 'Try a different PDF file.' : 'No duties have been added manually.'}</p>                           
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">

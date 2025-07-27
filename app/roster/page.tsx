@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Calendar, Plane, PlusCircle } from 'lucide-react';
@@ -28,6 +28,7 @@ export default function RosterPage() {
   const bottomScrollRef = useRef<HTMLDivElement>(null);
   const scrollSyncRef = useRef<'top' | 'bottom' | null>(null);
   const dateColumnRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+
 
   // --- DATA FETCHING & LOGIC ---
 
@@ -109,50 +110,53 @@ export default function RosterPage() {
     return grouped;
   }, [filteredAvailableDuties]); // This recalculates only when the filtered duties change.
 
-// Memoized grouping of duties for rendering, recalculated when filtered duties change
-const groupedDuties = useMemo(() => {
-  const grouped = new Map<string, { userDuty: Duty | null; availableDuties: Duty[] }>();
-  const allDutiesForDates = [...duties, ...filteredAvailableDuties];
+  // Memoized grouping of duties for rendering, recalculated when filtered duties change
+  const groupedDuties = useMemo(() => {
+    const grouped = new Map<string, { userDuty: Duty | null; availableDuties: Duty[] }>();
+    const allDutiesForDates = [...duties, ...filteredAvailableDuties];
 
-  // If there are no duties at all, return an empty map.
-  if (allDutiesForDates.length === 0) {
+    // If there are no duties at all, return an empty map.
+    if (allDutiesForDates.length === 0) {
+      return grouped;
+    }
+
+    // 1. Find the date range
+    const dateTimestamps = allDutiesForDates.map(d => new Date(d.date).getTime());
+    const minDate = new Date(Math.min(...dateTimestamps));
+    const maxDate = new Date(Math.max(...dateTimestamps));
+
+    // 2. Generate a continuous array of dates
+    const allDates = [];
+    let currentDate = new Date(minDate);
+    // Set to midnight UTC to avoid timezone issues during iteration
+    currentDate.setUTCHours(0, 0, 0, 0);
+
+    while (currentDate <= maxDate) {
+      allDates.push(format(currentDate, 'yyyy-MM-dd'));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // 3. Use the new continuous date array to build the map
+    allDates.forEach(date => grouped.set(date, { userDuty: null, availableDuties: [] }));
+
+    duties.forEach(duty => {
+      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
+      const entry = grouped.get(dateKey);
+      if (entry) entry.userDuty = duty;
+    });
+
+    filteredAvailableDuties.forEach(duty => {
+      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
+      const entry = grouped.get(dateKey);
+      // This check is important because a duty might be outside the filtered range of other duties
+      if (entry) entry.availableDuties.push(duty);
+    });
+
     return grouped;
-  }
+  }, [duties, filteredAvailableDuties]);
 
-  // 1. Find the date range
-  const dateTimestamps = allDutiesForDates.map(d => new Date(d.date).getTime());
-  const minDate = new Date(Math.min(...dateTimestamps));
-  const maxDate = new Date(Math.max(...dateTimestamps));
 
-  // 2. Generate a continuous array of dates
-  const allDates = [];
-  let currentDate = new Date(minDate);
-  // Set to midnight UTC to avoid timezone issues during iteration
-  currentDate.setUTCHours(0, 0, 0, 0);
-
-  while (currentDate <= maxDate) {
-    allDates.push(format(currentDate, 'yyyy-MM-dd'));
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  // 3. Use the new continuous date array to build the map
-  allDates.forEach(date => grouped.set(date, { userDuty: null, availableDuties: [] }));
-
-  duties.forEach(duty => {
-    const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-    const entry = grouped.get(dateKey);
-    if (entry) entry.userDuty = duty;
-  });
-
-  filteredAvailableDuties.forEach(duty => {
-    const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-    const entry = grouped.get(dateKey);
-    // This check is important because a duty might be outside the filtered range of other duties
-    if (entry) entry.availableDuties.push(duty);
-  });
-
-  return grouped;
-}, [duties, filteredAvailableDuties]);
+  const dateKeys = Array.from(groupedDuties.keys());
 
   // Effect to scroll to today's date once the initial data load is complete
   useEffect(() => {
@@ -189,6 +193,67 @@ const groupedDuties = useMemo(() => {
     }
   };
 
+
+  useLayoutEffect(() => {
+    // Only run this logic when the data is loaded and has been rendered
+    if (isLoading || !topScrollRef.current || !bottomScrollRef.current) {
+      return;
+    }
+
+    const topContainer = topScrollRef.current;
+    const bottomContainer = bottomScrollRef.current;
+
+    // A function to run the synchronization
+    const syncHeights = () => {
+      dateKeys.forEach(dateKey => {
+        // Find all card containers (the direct parents of DutyCard or "No Duty" placeholder) for this date
+        const topCardWrapper = topContainer.querySelector(`[data-date-key="${dateKey}"]`);
+        const bottomCardWrappers = bottomContainer.querySelectorAll(`[data-date-key="${dateKey}"]`);
+
+        const elements = [topCardWrapper, ...Array.from(bottomCardWrappers)].filter(Boolean);
+
+        if (elements.length === 0) return;
+
+        // Reset heights to auto before measuring to get their natural height
+        elements.forEach(el => {
+          if (el instanceof HTMLElement) {
+            el.style.minHeight = 'auto';
+          }
+        });
+
+        // Give the browser a moment to apply the 'auto' height
+        requestAnimationFrame(() => {
+          let maxHeight = 0;
+          elements.forEach(el => {
+            if (el instanceof HTMLElement) {
+              // Use scrollHeight to get the full content height
+              if (el.scrollHeight > maxHeight) {
+                maxHeight = el.scrollHeight;
+              }
+            }
+          });
+
+          // Apply the tallest height to all elements in that column, but only if it's a meaningful height
+          if (maxHeight > 90) { // Using 90px as a baseline from your "No Duty" min-height
+            elements.forEach(el => {
+              if (el instanceof HTMLElement) {
+                el.style.minHeight = `${maxHeight}px`;
+              }
+            });
+          }
+        });
+      });
+    };
+
+    // Run synchronization. The timeout helps ensure all rendering is complete.
+    const timer = setTimeout(syncHeights, 100);
+
+    // Cleanup function
+    return () => clearTimeout(timer);
+
+    // Rerun this effect whenever the data that affects the layout changes
+  }, [isLoading, duties, filteredAvailableDuties, dateKeys]);
+
   // --- RENDER LOGIC ---
 
   if (isLoading) {
@@ -201,8 +266,6 @@ const groupedDuties = useMemo(() => {
       </div>
     );
   }
-
-  const dateKeys = Array.from(groupedDuties.keys());
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -253,7 +316,7 @@ const groupedDuties = useMemo(() => {
             {dateKeys.map(dateKey => (
               <div
                 key={dateKey}
-                className="w-80 flex-shrink-0"
+                className="w-72 flex-shrink-0"
                 ref={(el) => {
                   if (el) {
                     dateColumnRefs.current.set(dateKey, el);
@@ -266,7 +329,7 @@ const groupedDuties = useMemo(() => {
                 <div className="text-center font-semibold text-sm text-muted-foreground pb-2 border-b-2 ">
                   {format(new Date(dateKey.replace(/-/g, '/')), 'EEE dd MMM').toUpperCase()}
                 </div>
-                <div className="pt-3 pl-1 h-fit">
+                <div className="grid pt-3 pl-1" data-date-key={dateKey}>
                   {groupedDuties.get(dateKey)?.userDuty ? (
                     <DutyCard
                       duty={groupedDuties.get(dateKey)!.userDuty!}
@@ -274,7 +337,7 @@ const groupedDuties = useMemo(() => {
                       onSwapRequested={handleSwapRequested}
                     />
                   ) : (
-                    <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground min-h-[100px]">
+                    <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground">
                       <p className="text-muted-foreground font-medium">No Duty</p>
                     </div>
                   )}
@@ -297,7 +360,7 @@ const groupedDuties = useMemo(() => {
               onScroll={() => handleScroll('bottom')}
               onMouseEnter={() => scrollSyncRef.current = 'bottom'}
             >
-              <div className="space-y-4">
+              <div className="grid gap-4">
                 {/* Loop over each USER to create a row */}
                 {Array.from(dutiesByUser.keys()).map(userId => {
                   const userDutiesMap = dutiesByUser.get(userId)!;
@@ -315,7 +378,8 @@ const groupedDuties = useMemo(() => {
                       <div className="flex space-x-4">
                         {/* Loop over each DATE to create a column */}
                         {dateKeys.map(dateKey => (
-                          <div key={dateKey} className="w-80 flex-shrink-0">
+                          <div key={dateKey} className="w-72 flex-shrink-0" data-date-key={dateKey}>
+                            {/* POTENTIALLY MAKE THE WIDTH A VARIABLE */}
                             {userDutiesMap.has(dateKey) ? (
                               // If the user has a duty on this date, show it
                               <DutyCard
@@ -324,9 +388,9 @@ const groupedDuties = useMemo(() => {
                               />
                             ) : (
                               // Otherwise, show a placeholder to keep alignment
-                              <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground min-h-[100px]">
-                              <p className="text-muted-foreground font-medium">No Duty</p>
-                            </div>
+                              <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground">
+                                <p className="text-muted-foreground font-medium">No Duty</p>
+                              </div>
                             )}
                           </div>
                         ))}
