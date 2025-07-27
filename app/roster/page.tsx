@@ -109,28 +109,50 @@ export default function RosterPage() {
     return grouped;
   }, [filteredAvailableDuties]); // This recalculates only when the filtered duties change.
 
-  // Memoized grouping of duties for rendering, recalculated when filtered duties change
-  const groupedDuties = useMemo(() => {
-    const grouped = new Map<string, { userDuty: Duty | null; availableDuties: Duty[] }>();
-    const allDutiesForDates = [...duties, ...filteredAvailableDuties];
-    const allDates = [...new Set(allDutiesForDates.map(d => format(new Date(d.date), 'yyyy-MM-dd')))].sort();
+// Memoized grouping of duties for rendering, recalculated when filtered duties change
+const groupedDuties = useMemo(() => {
+  const grouped = new Map<string, { userDuty: Duty | null; availableDuties: Duty[] }>();
+  const allDutiesForDates = [...duties, ...filteredAvailableDuties];
 
-    allDates.forEach(date => grouped.set(date, { userDuty: null, availableDuties: [] }));
-
-    duties.forEach(duty => {
-      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-      const entry = grouped.get(dateKey);
-      if (entry) entry.userDuty = duty;
-    });
-
-    filteredAvailableDuties.forEach(duty => {
-      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-      const entry = grouped.get(dateKey);
-      if (entry) entry.availableDuties.push(duty);
-    });
-
+  // If there are no duties at all, return an empty map.
+  if (allDutiesForDates.length === 0) {
     return grouped;
-  }, [duties, filteredAvailableDuties]);
+  }
+
+  // 1. Find the date range
+  const dateTimestamps = allDutiesForDates.map(d => new Date(d.date).getTime());
+  const minDate = new Date(Math.min(...dateTimestamps));
+  const maxDate = new Date(Math.max(...dateTimestamps));
+
+  // 2. Generate a continuous array of dates
+  const allDates = [];
+  let currentDate = new Date(minDate);
+  // Set to midnight UTC to avoid timezone issues during iteration
+  currentDate.setUTCHours(0, 0, 0, 0);
+
+  while (currentDate <= maxDate) {
+    allDates.push(format(currentDate, 'yyyy-MM-dd'));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+
+  // 3. Use the new continuous date array to build the map
+  allDates.forEach(date => grouped.set(date, { userDuty: null, availableDuties: [] }));
+
+  duties.forEach(duty => {
+    const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
+    const entry = grouped.get(dateKey);
+    if (entry) entry.userDuty = duty;
+  });
+
+  filteredAvailableDuties.forEach(duty => {
+    const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
+    const entry = grouped.get(dateKey);
+    // This check is important because a duty might be outside the filtered range of other duties
+    if (entry) entry.availableDuties.push(duty);
+  });
+
+  return grouped;
+}, [duties, filteredAvailableDuties]);
 
   // Effect to scroll to today's date once the initial data load is complete
   useEffect(() => {
@@ -186,7 +208,7 @@ export default function RosterPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header user={user} />
 
-      <main className="container max-w-screen-xl mx-auto px-4 py-8 flex-1 flex flex-col">
+      <main className="w-full px-4 py-8 flex-1 flex flex-col">
         <CardHeader className="px-0 flex flex-row items-center justify-between">
           <div className="space-y-1">
             <CardTitle className="flex items-center gap-2 text-2xl">

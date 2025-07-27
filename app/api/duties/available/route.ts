@@ -22,7 +22,8 @@ export async function GET() {
             name: true,
             role: true,
           }
-        }
+        },
+        legs: true,
       },
       orderBy: { date: 'asc' }
     });

@@ -1,31 +1,113 @@
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String         @id @default(cuid())
+  email                String         @unique
+  name                 String
+  role                 UserRole
+  password             String
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  base                 EWLBases       @default(PMI)
+  isAdmin              Boolean        @default(false)
+  duties               Duty[]
+  notifications        Notification[]
+  receivedSwapRequests SwapRequest[]  @relation("SwapRequestReceiver")
+  sentSwapRequests     SwapRequest[]  @relation("SwapRequestSender")
+
+  @@map("users")
+}
+
+model Duty {
+  id                 String        @id @default(uuid())
+  date               DateTime
+  userId             String
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+  pairing            String?
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  legs               FlightLeg[]
+  sentSwapRequests   SwapRequest[] @relation("SwapRequestSenderDuty")
+  targetSwapRequests SwapRequest[] @relation("SwapRequestTargetDuty")
+
+  @@map("duties")
+}
+
+model FlightLeg {
+  id                String   @id @default(uuid())
+  dutyId            String
+  flightNumber      String
+  departureTime     DateTime
+  arrivalTime       DateTime
+  departureLocation String
+  arrivalLocation   String
+  isDeadhead        Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  duty              Duty     @relation(fields: [dutyId], references: [id])
+
+  @@map("flight_legs")
+}
+
+model SwapRequest {
+  id              String            @id @default(cuid())
+  senderId        String
+  receiverId      String
+  senderDutyId    String
+  targetDutyId    String
+  status          SwapRequestStatus @default(PENDING)
+  message         String?
+  responseMessage String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  receiver        User              @relation("SwapRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+  senderDuty      Duty              @relation("SwapRequestSenderDuty", fields: [senderDutyId], references: [id], onDelete: Cascade)
+  sender          User              @relation("SwapRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
+  targetDuty      Duty              @relation("SwapRequestTargetDuty", fields: [targetDutyId], references: [id], onDelete: Cascade)
+
+  @@map("swap_requests")
+}
+
+model Notification {
+  id            String           @id @default(cuid())
+  userId        String
+  type          NotificationType
+  title         String
+  message       String
+  isRead        Boolean          @default(false)
+  swapRequestId String?
+  createdAt     DateTime         @default(now())
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 enum UserRole {
-    CAPTAIN
-    FIRST_OFFICER
-    PURSER
-    CABIN_ATTENDANT
+  CAPTAIN
+  FIRST_OFFICER
+  PURSER
+  CABIN_ATTENDANT
 }
 
 enum SwapRequestStatus {
-    PENDING
-    APPROVED
-    DENIED
-    CANCELLED
+  PENDING
+  APPROVED
+  DENIED
+  CANCELLED
 }
 
 enum NotificationType {
-    SWAP_REQUEST_RECEIVED
-    SWAP_REQUEST_APPROVED
-    SWAP_REQUEST_DENIED
-    SWAP_REQUEST_CANCELLED
+  SWAP_REQUEST_RECEIVED
+  SWAP_REQUEST_APPROVED
+  SWAP_REQUEST_DENIED
+  SWAP_REQUEST_CANCELLED
 }
 
 enum EWLBases {
@@ -38,82 +120,3 @@ enum EWLBases {
   WP_BCN
   WP_PRG
 }
-
-
-model User {
-    id        String   @id @default(cuid())
-    email     String   @unique
-    name      String
-    role      UserRole
-    password  String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    base      EWLBases  @default(PMI)// <-- New field for the user's base
-    isAdmin   Boolean   @default(false) // <-- New field for admin status   
-    // Relations
-    duties                Duty[]
-    sentSwapRequests      SwapRequest[] @relation("SwapRequestSender")
-    receivedSwapRequests  SwapRequest[] @relation("SwapRequestReceiver")
-    notifications         Notification[]
-
-    @@map("users")
-}
-
-model Duty {
-    id               String   @id @default(cuid())
-    flightNumber     String
-    date             DateTime
-    departureTime    DateTime
-    arrivalTime      DateTime
-    departureLocation String
-    arrivalLocation  String
-    userId           String
-    createdAt        DateTime @default(now())
-    updatedAt        DateTime @updatedAt
-
-    // Relations
-    user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-    sentSwapRequests  SwapRequest[] @relation("SwapRequestSenderDuty")
-    targetSwapRequests SwapRequest[] @relation("SwapRequestTargetDuty")
-
-    @@map("duties")
-}
-
-model SwapRequest {
-    id              String            @id @default(cuid())
-    senderId        String
-    receiverId      String
-    senderDutyId    String
-    targetDutyId    String
-    status          SwapRequestStatus @default(PENDING)
-    message         String?
-    responseMessage String?
-    createdAt       DateTime          @default(now())
-    updatedAt       DateTime          @updatedAt
-
-    // Relations
-    sender      User @relation("SwapRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
-    receiver    User @relation("SwapRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-    senderDuty  Duty @relation("SwapRequestSenderDuty", fields: [senderDutyId], references: [id], onDelete: Cascade)
-    targetDuty  Duty @relation("SwapRequestTargetDuty", fields: [targetDutyId], references: [id], onDelete: Cascade)
-
-    @@map("swap_requests")
-}
-
-model Notification {
-    id        String           @id @default(cuid())
-    userId    String
-    type      NotificationType
-    title     String
-    message   String
-    isRead    Boolean          @default(false)
-    swapRequestId String?
-    createdAt DateTime         @default(now())
-
-    // Relations
-    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-    @@map("notifications")
-}
-

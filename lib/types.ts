@@ -9,14 +9,22 @@ export interface User {
 
 export interface Duty {
   id: string;
-  flightNumber: string;
   date: string;
+  legs: FlightLeg[];
+  user?: User;
+  pairing: string | null; // string is common UUID for all duties in a pairing
+}
+
+export interface FlightLeg {
+  id: string;
+  flightNumber: string;
   departureTime: string;
   arrivalTime: string;
   departureLocation: string;
   arrivalLocation: string;
-  user?: User;
+  isDeadhead: boolean;
 }
+
 
 export const roles = [
   { value: 'CAPTAIN', label: 'Captain' },

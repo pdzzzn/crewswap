@@ -64,62 +64,44 @@ export default function DutyCard({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-primary/20 rounded-lg">
-                <Plane className="w-5 h-5 text-primary" />
-              </div>
-              <div>
-                <CardTitle className="text-lg font-bold text-primary">
-                  {duty.flightNumber}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground">{getDayOfWeek(duty.date)}</p>
-              </div>
+              <Plane className="h-5 w-5 text-primary" />
+              <CardTitle className="text-lg font-bold">
+                {formatDate(duty.date)}
+              </CardTitle>
             </div>
-            <Badge variant="outline" className="text-sm">
-              {formatDate(duty.date)}
+            <Badge variant="outline" className="text-xs">
+              {duty.legs.length} {duty.legs.length === 1 ? 'Leg' : 'Legs'}
             </Badge>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="text-center">
-                <p className="text-lg font-bold text-foreground">
-                  {formatTime(duty.departureTime)}
-                </p>
-                <p className="text-sm text-muted-foreground font-medium">
-                  {duty.departureLocation}
-                </p>
-              </div>
 
-              <div className="flex flex-col items-center gap-1 px-3">
-                <ArrowRight className="w-4 h-4 text-muted-foreground/70" />
-                <p className="text-xs text-muted-foreground">
-                  {calculateDuration(duty.departureTime, duty.arrivalTime)}
-                </p>
-              </div>
 
-              <div className="text-center">
-                <p className="text-lg font-bold text-foreground">
-                  {formatTime(duty.arrivalTime)}
-                </p>
-                <p className="text-sm text-muted-foreground font-medium">
-                  {duty.arrivalLocation}
-                </p>
+        <CardContent className="space-y-4 pt-4">
+          {duty.legs.map((leg, index) => (
+            <div key={leg.id} className={`p-2 rounded-lg bg-muted/50 ${index > 0 ? 'mt-3' : ''}`}>
+              <div className="flex items-center justify-between font-semibold text-sm">
+                <span>{leg.isDeadhead ? 'DH/'+leg.flightNumber : leg.flightNumber}</span>
+                <span className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
+                  {calculateDuration(leg.departureTime, leg.arrivalTime)}
+                </span>
+              </div>
+              <div className="flex items-center justify-between text-sm mt-2">
+                <div className="text-left">
+                  <div className="font-medium">{leg.departureLocation}</div>
+                  <div className="text-muted-foreground">{formatTime(leg.departureTime)}</div>
+                </div>
+                <ArrowRight className="h-4 w-4 text-muted-foreground mx-2 flex-shrink-0" />
+                <div className="text-right">
+                  <div className="font-medium">{leg.arrivalLocation}</div>
+                  <div className="text-muted-foreground">{formatTime(leg.arrivalTime)}</div>
+                </div>
               </div>
             </div>
-          </div>
+          ))}
 
-          <div className="flex gap-2 pt-2 border-t border-border">
-            <Clock className="w-4 h-4 text-muted-foreground/70" />
-            <span className="text-sm text-muted-foreground">
-              Duration: {calculateDuration(duty.departureTime, duty.arrivalTime)}
-            </span>
-          </div>
-
-          {/* The existing swap button is now wrapped in this condition */}
           {showSwapButton && (
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-4">
               <Button
                 variant="outline"
                 size="sm"
@@ -133,7 +115,7 @@ export default function DutyCard({
           )}
         </CardContent>
       </Card>
-
+      {/*
       <SwapRequestModal
         isOpen={showSwapModal}
         onClose={() => setShowSwapModal(false)}
@@ -143,6 +125,7 @@ export default function DutyCard({
           onSwapRequested?.();
         }}
       />
+      */}
     </>
   );
 }

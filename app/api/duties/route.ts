@@ -11,6 +11,9 @@ export async function GET() {
 
     const duties = await prisma.duty.findMany({
       where: { userId: user.id },
+      include: {
+        legs: true,
+      },
       orderBy: { date: 'asc' }
     });
 
