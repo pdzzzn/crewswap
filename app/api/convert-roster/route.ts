@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
-import FormData from 'form-data';
 import * as cheerio from 'cheerio';
+import { logToFile, logIcsContent, logParsedDuties } from '@/lib/logger';
 import path from 'path';
-
+import FormData from 'form-data';
 
 // --- External Service Configuration ---
 const CONVERTER_URL = 'https://www.dienstplankonverter.de/index.php?action=convert';
@@ -56,9 +56,12 @@ async function processFile(request: NextRequest): Promise<ParsedFile | null> {
  * @param icsContent The content of the .ics file as a string.
  * @returns An array of parsed duty objects.
  */
-function parseIcsToDuties(icsContent: string): ParsedDuty[] {
+export function parseIcsToDuties(icsContent: string): ParsedDuty[] {
     // This is a simplified parser - in a real implementation, you would need
     // a proper .ics parser to extract the duty information
+    logToFile('Parsing .ics file content:', 'parsing.log');
+    logToFile(icsContent, 'ics-content.log');
+    logToFile('End of .ics file content', 'parsing.log');
     
     const duties: ParsedDuty[] = [];
     
@@ -72,9 +75,10 @@ function parseIcsToDuties(icsContent: string): ParsedDuty[] {
     for (const line of lines) {
         if (line.startsWith('BEGIN:VEVENT')) {
             currentDuty = {};
+            logToFile('Starting to parse new event', 'parsing.log');
         } else if (line.startsWith('END:VEVENT') && currentDuty) {
             // Add the completed duty to our array
-            duties.push({
+            const newDuty: ParsedDuty = {
                 id: `parsed-${eventId++}`,
                 date: currentDuty.date || new Date().toISOString(),
                 flightNumber: currentDuty.flightNumber || 'Unknown',
@@ -82,31 +86,41 @@ function parseIcsToDuties(icsContent: string): ParsedDuty[] {
                 arrivalTime: currentDuty.arrivalTime || new Date().toISOString(),
                 departureLocation: currentDuty.departureLocation || 'Unknown',
                 arrivalLocation: currentDuty.arrivalLocation || 'Unknown',
-            });
+            };
+            
+            logToFile(`Parsed duty: ${JSON.stringify(newDuty)}`, 'parsing.log');
+            duties.push(newDuty);
             currentDuty = null;
         } else if (currentDuty) {
             // Parse event properties
             if (line.startsWith('SUMMARY:')) {
                 const summary = line.substring(8);
+                logToFile(`Processing SUMMARY: ${summary}`, 'parsing.log');
                 // Extract flight number from summary (simplified)
                 const flightMatch = summary.match(/([A-Z]{2}\d{1,4})/);
                 if (flightMatch) {
                     currentDuty.flightNumber = flightMatch[1];
+                    logToFile(`Extracted flight number: ${currentDuty.flightNumber}`, 'parsing.log');
                 }
             } else if (line.startsWith('DTSTART:')) {
                 const time = line.split("T")[1].substring(0, 5);
                 currentDuty.departureTime = time;
-                console.log(`Departure time: ${currentDuty.departureTime}`);
+                logToFile(`Departure time: ${currentDuty.departureTime}`, 'parsing.log');
                 currentDuty.date = line.substring(8, 16); // Extract date part
+                logToFile(`Date: ${currentDuty.date}`, 'parsing.log');
             } else if (line.startsWith('DTEND:')) {
                 currentDuty.arrivalTime = line.substring(6);
+                logToFile(`Arrival time: ${currentDuty.arrivalTime}`, 'parsing.log');
             } else if (line.startsWith('LOCATION:')) {
                 const location = line.substring(9);
+                logToFile(`Processing LOCATION: ${location}`, 'parsing.log');
                 // Split location into departure and arrival (simplified)
                 const locations = location.split(' - ');
                 if (locations.length >= 2) {
                     currentDuty.departureLocation = locations[0];
                     currentDuty.arrivalLocation = locations[1];
+                    logToFile(`Departure location: ${currentDuty.departureLocation}`, 'parsing.log');
+                    logToFile(`Arrival location: ${currentDuty.arrivalLocation}`, 'parsing.log');
                 }
             }
         }
@@ -128,10 +142,10 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
             return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
         }
 
-        console.log(`[API] Received file: ${file.originalname}`);
+        logToFile(`Received file: ${file.originalname}`, 'parsing.log');
 
         // --- Step 1: Forward the file to the external service ---
-        console.log('[API] Step 1: Forwarding file...');
+        logToFile('Step 1: Forwarding file...', 'parsing.log');
         const form = new FormData();
         form.append('file', file.buffer, file.originalname);
         form.append('MAX_FILE_SIZE', '10000000');
@@ -143,20 +157,20 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
         });
 
         // --- Step 2: Parse the HTML response for the download link ---
-        console.log('[API] Step 2: Parsing response...');
+        logToFile('Step 2: Parsing response...', 'parsing.log');
         const $ = cheerio.load(uploadResponse.data);
         const downloadLink = $('.modal-footer a').first().attr('href');
 
         if (!downloadLink) {
-            console.error('[API] Could not find the download link.');
+            logToFile('Could not find the download link.', 'error.log');
             return NextResponse.json({ error: 'Conversion failed: Could not find download link.' }, { status: 500 });
         }
         
         const fullDownloadUrl = BASE_URL + downloadLink;
-        console.log(`[API] Found download link: ${fullDownloadUrl}`);
+        logToFile(`Found download link: ${fullDownloadUrl}`, 'parsing.log');
 
         // --- Step 3: Download the .ics file ---
-        console.log('[API] Step 3: Downloading .ics file...');
+        logToFile('Step 3: Downloading .ics file...', 'parsing.log');
         const fileResponse = await axios({
             method: 'get',
             url: fullDownloadUrl,
@@ -164,10 +178,12 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
         });
 
         // --- Step 4: Parse the .ics file and return duties as JSON ---
-        console.log('[API] Step 4: Parsing .ics file to duties...');
+        logToFile('Step 4: Parsing .ics file to duties...', 'parsing.log');
+        logIcsContent(fileResponse.data);
         const duties = parseIcsToDuties(fileResponse.data);
         
-        console.log(`[API] Parsed ${duties.length} duties from .ics file`);
+        logToFile(`Parsed ${duties.length} duties from .ics file`, 'parsing.log');
+        logParsedDuties(duties);
         
         // Return the parsed duties as JSON
         return NextResponse.json({ duties }, { status: 200 });

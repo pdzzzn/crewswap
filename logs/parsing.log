@@ -1,0 +1,586 @@
+[2025-07-31T19:39:59.037Z] Received file: HP9.pdf
+[2025-07-31T19:39:59.038Z] Step 1: Forwarding file...
+[2025-07-31T19:40:00.668Z] Step 2: Parsing response...
+[2025-07-31T19:40:00.687Z] Found download link: https://www.dienstplankonverter.de/fileExchange/Leg - 01Aug25 - 31Aug25 (EW - 720191 - ACC5).ics
+[2025-07-31T19:40:00.687Z] Step 3: Downloading .ics file...
+[2025-07-31T19:40:00.751Z] Step 4: Parsing .ics file to duties...
+[2025-07-31T19:40:00.751Z] ICS content saved to ics-content-2025-07-31T19-40-00-751Z.log
+[2025-07-31T19:40:00.751Z] Parsing .ics file content:
+[2025-07-31T19:40:00.751Z] End of .ics file content
+[2025-07-31T19:40:00.751Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Urlaub PMI
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-0","date":"2025-07-31T19:40:00.752Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.752Z","arrivalTime":"2025-07-31T19:40:00.752Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Urlaub PMI
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-1","date":"2025-07-31T19:40:00.752Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.752Z","arrivalTime":"2025-07-31T19:40:00.752Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-2","date":"2025-07-31T19:40:00.752Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.752Z","arrivalTime":"2025-07-31T19:40:00.752Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250804
+[2025-07-31T19:40:00.752Z] Arrival time: 20250804T210000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Standby PMI
+[2025-07-31T19:40:00.752Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-3","date":"20250804","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250804T210000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250805
+[2025-07-31T19:40:00.752Z] Arrival time: 20250805T160000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Checkin PMI (18:00 CEST)
+[2025-07-31T19:40:00.752Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-4","date":"20250805","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250805T160000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250805
+[2025-07-31T19:40:00.752Z] Arrival time: 20250805T193500Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: EW 6850 PMI - HAJ
+[2025-07-31T19:40:00.752Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-5","date":"20250805","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250805T193500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250805
+[2025-07-31T19:40:00.752Z] Arrival time: 20250805T200500Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Checkout HAJ (22:05 CEST)
+[2025-07-31T19:40:00.752Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-6","date":"20250805","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250805T200500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250806
+[2025-07-31T19:40:00.752Z] Arrival time: 20250806T103500Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Checkin HAJ (12:35 CEST)
+[2025-07-31T19:40:00.752Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-7","date":"20250806","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250806T103500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250806
+[2025-07-31T19:40:00.752Z] Arrival time: 20250806T135500Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: EW 6603 HAJ - PRN
+[2025-07-31T19:40:00.752Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-8","date":"20250806","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250806T135500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250806
+[2025-07-31T19:40:00.752Z] Arrival time: 20250806T163000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: EW 6614 PRN - MUC
+[2025-07-31T19:40:00.752Z] Processing LOCATION: PRN
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-9","date":"20250806","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250806T163000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250806
+[2025-07-31T19:40:00.752Z] Arrival time: 20250806T192500Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: EW 6615 MUC - PRN
+[2025-07-31T19:40:00.752Z] Processing LOCATION: MUC
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-10","date":"20250806","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250806T192500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250806
+[2025-07-31T19:40:00.752Z] Arrival time: 20250806T223000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: EW 6602 PRN - HAJ
+[2025-07-31T19:40:00.752Z] Processing LOCATION: PRN
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-11","date":"20250806","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250806T223000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250806
+[2025-07-31T19:40:00.752Z] Arrival time: 20250806T230000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Checkout HAJ (01:00 CEST)
+[2025-07-31T19:40:00.752Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-12","date":"20250806","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250806T230000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250807
+[2025-07-31T19:40:00.752Z] Arrival time: 20250807T151000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Checkin HAJ (17:10 CEST)
+[2025-07-31T19:40:00.752Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-13","date":"20250807","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250807T151000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250807
+[2025-07-31T19:40:00.752Z] Arrival time: 20250807T184000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: EW 6851 HAJ - PMI
+[2025-07-31T19:40:00.752Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.752Z] Parsed duty: {"id":"parsed-14","date":"20250807","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250807T184000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.752Z] Starting to parse new event
+[2025-07-31T19:40:00.752Z] Departure time: S
+[2025-07-31T19:40:00.752Z] Date: 20250807
+[2025-07-31T19:40:00.752Z] Arrival time: 20250807T191000Z
+[2025-07-31T19:40:00.752Z] Processing SUMMARY: Checkout PMI (21:10 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-15","date":"20250807","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250807T191000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250808
+[2025-07-31T19:40:00.753Z] Arrival time: 20250808T113000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkin PMI (13:30 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-16","date":"20250808","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250808T113000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250808
+[2025-07-31T19:40:00.753Z] Arrival time: 20250808T150000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 6802 PMI - DRS
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-17","date":"20250808","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250808T150000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250808
+[2025-07-31T19:40:00.753Z] Arrival time: 20250808T182000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 6803 DRS - PMI
+[2025-07-31T19:40:00.753Z] Processing LOCATION: DRS
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-18","date":"20250808","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250808T182000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250808
+[2025-07-31T19:40:00.753Z] Arrival time: 20250808T185000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkout PMI (20:50 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-19","date":"20250808","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250808T185000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-20","date":"2025-07-31T19:40:00.753Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.753Z","arrivalTime":"2025-07-31T19:40:00.753Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-21","date":"2025-07-31T19:40:00.753Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.753Z","arrivalTime":"2025-07-31T19:40:00.753Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250811
+[2025-07-31T19:40:00.753Z] Arrival time: 20250811T210000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Standby PMI
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-22","date":"20250811","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250811T210000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250812
+[2025-07-31T19:40:00.753Z] Arrival time: 20250812T113000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkin PMI (13:30 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-23","date":"20250812","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250812T113000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250812
+[2025-07-31T19:40:00.753Z] Arrival time: 20250812T150500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 6852 PMI - HAJ
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-24","date":"20250812","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250812T150500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250812
+[2025-07-31T19:40:00.753Z] Arrival time: 20250812T184000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 6853 HAJ - PMI
+[2025-07-31T19:40:00.753Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-25","date":"20250812","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250812T184000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250812
+[2025-07-31T19:40:00.753Z] Arrival time: 20250812T220500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 3591 PMI - HAJ
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-26","date":"20250812","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250812T220500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250812
+[2025-07-31T19:40:00.753Z] Arrival time: 20250812T223500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkout HAJ (00:35 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-27","date":"20250812","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250812T223500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250813
+[2025-07-31T19:40:00.753Z] Arrival time: 20250813T151000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkin HAJ (17:10 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-28","date":"20250813","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250813T151000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250813
+[2025-07-31T19:40:00.753Z] Arrival time: 20250813T184000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 6851 HAJ - PMI
+[2025-07-31T19:40:00.753Z] Processing LOCATION: HAJ
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-29","date":"20250813","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250813T184000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250813
+[2025-07-31T19:40:00.753Z] Arrival time: 20250813T191000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkout PMI (21:10 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-30","date":"20250813","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250813T191000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-31","date":"2025-07-31T19:40:00.753Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.753Z","arrivalTime":"2025-07-31T19:40:00.753Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-32","date":"2025-07-31T19:40:00.753Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.753Z","arrivalTime":"2025-07-31T19:40:00.753Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-33","date":"2025-07-31T19:40:00.753Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.753Z","arrivalTime":"2025-07-31T19:40:00.753Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-34","date":"2025-07-31T19:40:00.753Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.753Z","arrivalTime":"2025-07-31T19:40:00.753Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250818
+[2025-07-31T19:40:00.753Z] Arrival time: 20250818T062500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkin PMI (08:25 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-35","date":"20250818","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250818T062500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250818
+[2025-07-31T19:40:00.753Z] Arrival time: 20250818T094500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: DH/EW 9575 PMI - DUS
+[2025-07-31T19:40:00.753Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-36","date":"20250818","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250818T094500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250818
+[2025-07-31T19:40:00.753Z] Arrival time: 20250818T094500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkout DUS (11:45 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-37","date":"20250818","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250818T094500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250819
+[2025-07-31T19:40:00.753Z] Arrival time: 20250819T042000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Pickup DUS (06:20 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-38","date":"20250819","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250819T042000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250819
+[2025-07-31T19:40:00.753Z] Arrival time: 20250819T045000Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: Checkin DUS (06:50 CEST)
+[2025-07-31T19:40:00.753Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-39","date":"20250819","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250819T045000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250819
+[2025-07-31T19:40:00.753Z] Arrival time: 20250819T090500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 9670 DUS - HER
+[2025-07-31T19:40:00.753Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-40","date":"20250819","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250819T090500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.753Z] Departure time: S
+[2025-07-31T19:40:00.753Z] Date: 20250819
+[2025-07-31T19:40:00.753Z] Arrival time: 20250819T132500Z
+[2025-07-31T19:40:00.753Z] Processing SUMMARY: EW 9671 HER - DUS
+[2025-07-31T19:40:00.753Z] Processing LOCATION: HER
+[2025-07-31T19:40:00.753Z] Parsed duty: {"id":"parsed-41","date":"20250819","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250819T132500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.753Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250819
+[2025-07-31T19:40:00.754Z] Arrival time: 20250819T135500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkout DUS (15:55 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-42","date":"20250819","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250819T135500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250820
+[2025-07-31T19:40:00.754Z] Arrival time: 20250820T024500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Pickup DUS (04:45 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-43","date":"20250820","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250820T024500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250820
+[2025-07-31T19:40:00.754Z] Arrival time: 20250820T032500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkin DUS (05:25 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-44","date":"20250820","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250820T032500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250820
+[2025-07-31T19:40:00.754Z] Arrival time: 20250820T091000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9542 DUS - LPA
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-45","date":"20250820","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250820T091000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250820
+[2025-07-31T19:40:00.754Z] Arrival time: 20250820T142000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9543 LPA - DUS
+[2025-07-31T19:40:00.754Z] Processing LOCATION: LPA
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-46","date":"20250820","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250820T142000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250820
+[2025-07-31T19:40:00.754Z] Arrival time: 20250820T145000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkout DUS (16:50 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-47","date":"20250820","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250820T145000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250821
+[2025-07-31T19:40:00.754Z] Arrival time: 20250821T033000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Pickup DUS (05:30 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-48","date":"20250821","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250821T033000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250821
+[2025-07-31T19:40:00.754Z] Arrival time: 20250821T041000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkin DUS (06:10 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-49","date":"20250821","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250821T041000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250821
+[2025-07-31T19:40:00.754Z] Arrival time: 20250821T071500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9844 DUS - OLB
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-50","date":"20250821","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250821T071500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250821
+[2025-07-31T19:40:00.754Z] Arrival time: 20250821T100000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9845 OLB - DUS
+[2025-07-31T19:40:00.754Z] Processing LOCATION: OLB
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-51","date":"20250821","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250821T100000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250821
+[2025-07-31T19:40:00.754Z] Arrival time: 20250821T103000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkout DUS (12:30 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-52","date":"20250821","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250821T103000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250822
+[2025-07-31T19:40:00.754Z] Arrival time: 20250822T023000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Pickup DUS (04:30 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-53","date":"20250822","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250822T023000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250822
+[2025-07-31T19:40:00.754Z] Arrival time: 20250822T031000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkin DUS (05:10 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-54","date":"20250822","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250822T031000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250822
+[2025-07-31T19:40:00.754Z] Arrival time: 20250822T064500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9500 DUS - IBZ
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-55","date":"20250822","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250822T064500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250822
+[2025-07-31T19:40:00.754Z] Arrival time: 20250822T095000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9501 IBZ - DUS
+[2025-07-31T19:40:00.754Z] Processing LOCATION: IBZ
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-56","date":"20250822","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250822T095000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250822
+[2025-07-31T19:40:00.754Z] Arrival time: 20250822T102000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkout DUS (12:20 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-57","date":"20250822","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250822T102000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250823
+[2025-07-31T19:40:00.754Z] Arrival time: 20250823T030000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Pickup DUS (05:00 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-58","date":"20250823","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250823T030000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250823
+[2025-07-31T19:40:00.754Z] Arrival time: 20250823T034000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkin DUS (05:40 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-59","date":"20250823","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250823T034000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250823
+[2025-07-31T19:40:00.754Z] Arrival time: 20250823T063000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9432 DUS - BIA
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-60","date":"20250823","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250823T063000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250823
+[2025-07-31T19:40:00.754Z] Arrival time: 20250823T085500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 9433 BIA - DUS
+[2025-07-31T19:40:00.754Z] Processing LOCATION: BIA
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-61","date":"20250823","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250823T085500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250823
+[2025-07-31T19:40:00.754Z] Arrival time: 20250823T133000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: DH/EW 9580 DUS - PMI
+[2025-07-31T19:40:00.754Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-62","date":"20250823","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250823T133000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250823
+[2025-07-31T19:40:00.754Z] Arrival time: 20250823T133000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkout PMI (15:30 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-63","date":"20250823","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250823T133000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-64","date":"2025-07-31T19:40:00.754Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.754Z","arrivalTime":"2025-07-31T19:40:00.754Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-65","date":"2025-07-31T19:40:00.754Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.754Z","arrivalTime":"2025-07-31T19:40:00.754Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Off PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-66","date":"2025-07-31T19:40:00.754Z","flightNumber":"Unknown","departureTime":"2025-07-31T19:40:00.754Z","arrivalTime":"2025-07-31T19:40:00.754Z","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250827
+[2025-07-31T19:40:00.754Z] Arrival time: 20250827T140000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Standby PMI
+[2025-07-31T19:40:00.754Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-67","date":"20250827","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250827T140000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250828
+[2025-07-31T19:40:00.754Z] Arrival time: 20250828T063000Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: Checkin PMI (08:30 CEST)
+[2025-07-31T19:40:00.754Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-68","date":"20250828","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250828T063000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250828
+[2025-07-31T19:40:00.754Z] Arrival time: 20250828T093500Z
+[2025-07-31T19:40:00.754Z] Processing SUMMARY: EW 6896 PMI - MUC
+[2025-07-31T19:40:00.754Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.754Z] Parsed duty: {"id":"parsed-69","date":"20250828","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250828T093500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.754Z] Starting to parse new event
+[2025-07-31T19:40:00.754Z] Departure time: S
+[2025-07-31T19:40:00.754Z] Date: 20250828
+[2025-07-31T19:40:00.754Z] Arrival time: 20250828T122500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 6897 MUC - PMI
+[2025-07-31T19:40:00.755Z] Processing LOCATION: MUC
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-70","date":"20250828","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250828T122500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250828
+[2025-07-31T19:40:00.755Z] Arrival time: 20250828T153000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 2581 PMI - STR
+[2025-07-31T19:40:00.755Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-71","date":"20250828","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250828T153000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250828
+[2025-07-31T19:40:00.755Z] Arrival time: 20250828T160000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkout STR (18:00 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: STR
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-72","date":"20250828","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250828T160000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250829
+[2025-07-31T19:40:00.755Z] Arrival time: 20250829T024000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Pickup STR (04:40 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: STR
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-73","date":"20250829","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250829T024000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250829
+[2025-07-31T19:40:00.755Z] Arrival time: 20250829T032000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkin STR (05:20 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: STR
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-74","date":"20250829","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250829T032000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250829
+[2025-07-31T19:40:00.755Z] Arrival time: 20250829T062000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 2582 STR - PMI
+[2025-07-31T19:40:00.755Z] Processing LOCATION: STR
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-75","date":"20250829","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250829T062000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250829
+[2025-07-31T19:40:00.755Z] Arrival time: 20250829T101000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: DH/EW 9577 PMI - DUS
+[2025-07-31T19:40:00.755Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-76","date":"20250829","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250829T101000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250829
+[2025-07-31T19:40:00.755Z] Arrival time: 20250829T101000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkout DUS (12:10 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-77","date":"20250829","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250829T101000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250830
+[2025-07-31T19:40:00.755Z] Arrival time: 20250830T022500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Pickup DUS (04:25 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-78","date":"20250830","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250830T022500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250830
+[2025-07-31T19:40:00.755Z] Arrival time: 20250830T030500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkin DUS (05:05 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-79","date":"20250830","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250830T030500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250830
+[2025-07-31T19:40:00.755Z] Arrival time: 20250830T054000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 9956 DUS - LJU
+[2025-07-31T19:40:00.755Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-80","date":"20250830","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250830T054000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250830
+[2025-07-31T19:40:00.755Z] Arrival time: 20250830T080000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 9957 LJU - DUS
+[2025-07-31T19:40:00.755Z] Processing LOCATION: LJU
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-81","date":"20250830","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250830T080000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250830
+[2025-07-31T19:40:00.755Z] Arrival time: 20250830T115000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: DH/EW 9578 DUS - PMI
+[2025-07-31T19:40:00.755Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-82","date":"20250830","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250830T115000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250830
+[2025-07-31T19:40:00.755Z] Arrival time: 20250830T115000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkout PMI (13:50 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-83","date":"20250830","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250830T115000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250831
+[2025-07-31T19:40:00.755Z] Arrival time: 20250831T100000Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkin PMI (12:00 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-84","date":"20250831","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250831T100000Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250831
+[2025-07-31T19:40:00.755Z] Arrival time: 20250831T130500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 6804 PMI - FKB
+[2025-07-31T19:40:00.755Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-85","date":"20250831","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250831T130500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250831
+[2025-07-31T19:40:00.755Z] Arrival time: 20250831T154500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 6805 FKB - PMI
+[2025-07-31T19:40:00.755Z] Processing LOCATION: FKB
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-86","date":"20250831","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250831T154500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250831
+[2025-07-31T19:40:00.755Z] Arrival time: 20250831T190500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: EW 6894 PMI - DUS
+[2025-07-31T19:40:00.755Z] Processing LOCATION: PMI
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-87","date":"20250831","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250831T190500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Starting to parse new event
+[2025-07-31T19:40:00.755Z] Departure time: S
+[2025-07-31T19:40:00.755Z] Date: 20250831
+[2025-07-31T19:40:00.755Z] Arrival time: 20250831T193500Z
+[2025-07-31T19:40:00.755Z] Processing SUMMARY: Checkout DUS (21:35 CEST)
+[2025-07-31T19:40:00.755Z] Processing LOCATION: DUS
+[2025-07-31T19:40:00.755Z] Parsed duty: {"id":"parsed-88","date":"20250831","flightNumber":"Unknown","departureTime":"S","arrivalTime":"20250831T193500Z\r","departureLocation":"Unknown","arrivalLocation":"Unknown"}
+[2025-07-31T19:40:00.755Z] Parsed 89 duties from .ics file
+[2025-07-31T19:40:00.756Z] Parsed duties saved to parsed-duties-2025-07-31T19-40-00-755Z.log

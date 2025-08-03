@@ -15,6 +15,10 @@ import DutyCard from '@/components/dashboard/duty-card';
 import { AddDutyForm } from './add-duty-form';
 import type { Duty, FlightLeg } from '@/lib/types';
 
+import { parseIcsToDuties } from '@/app/api/convert-roster/route';
+import { fstat, readFile } from 'fs';
+
+
 interface DutyStagingModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -62,24 +66,24 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
     const parsePdfAndSetDuties = async (file: File) => {
         setIsParsing(true);
         setParseError(null);
-        
+
         try {
             const formData = new FormData();
             formData.append('pdfFile', file);
-            
+
             const response = await fetch('/api/convert-roster', {
                 method: 'POST',
                 body: formData,
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Failed to parse PDF');
             }
-            
+
             // Handle the JSON response from the backend
             const result = await response.json();
-            
+
             // Convert parsed duties to Duty objects
             const duties: Duty[] = result.duties.map((parsedDuty: ParsedDuty, index: number) => {
                 // Create a FlightLeg from the parsed duty data
@@ -92,7 +96,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                     arrivalLocation: parsedDuty.arrivalLocation,
                     isDeadhead: false,
                 };
-                
+
                 // Create a Duty object
                 return {
                     id: parsedDuty.id,
@@ -101,12 +105,12 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                     pairing: null,
                 };
             });
-            
+
             // Update the stagedDuties state
             setStagedDuties(duties);
-            
+
             console.log(`Successfully parsed ${duties.length} duties from PDF`);
-            
+
         } catch (error: any) {
             console.error('Error parsing PDF:', error);
             setParseError(error.message || 'Failed to parse PDF');
@@ -134,7 +138,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
         const files = e.dataTransfer.files;
         handleFileSelect(files);
     };
-    
+
     const handleDeleteStagedDuty = (dutyId: string) => {
         setStagedDuties(prev => prev.filter(duty => duty.id !== dutyId));
     };
@@ -173,7 +177,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
         // Clear staged duties when file is cleared
         setStagedDuties([]);
         setShowOverview(false);
-        if(fileInputRef.current) {
+        if (fileInputRef.current) {
             fileInputRef.current.value = "";
         }
     }
@@ -182,7 +186,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
     const getOverviewStats = () => {
         const totalDuties = stagedDuties.length;
         const totalLegs = stagedDuties.reduce((acc, duty) => acc + duty.legs.length, 0);
-        
+
         // Get unique destinations
         const destinations = new Set<string>();
         stagedDuties.forEach(duty => {
@@ -191,12 +195,12 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                 destinations.add(leg.arrivalLocation);
             });
         });
-        
+
         // Get date range
         const dates = stagedDuties.map(duty => new Date(duty.date));
         const minDate = dates.length > 0 ? new Date(Math.min(...dates as any)) : null;
         const maxDate = dates.length > 0 ? new Date(Math.max(...dates as any)) : null;
-        
+
         return {
             totalDuties,
             totalLegs,
@@ -240,18 +244,18 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                         </div>
                     ) : pdfFile ? (
                         <div className="flex flex-col items-center justify-center text-foreground">
-                             <FileText className="w-12 h-12 mb-4 text-primary" />
-                             <p className="font-semibold">{pdfFile.name}</p>
-                             <p className="text-sm text-muted-foreground">({(pdfFile.size / 1024).toFixed(2)} KB)</p>
-                             {parseError ? (
+                            <FileText className="w-12 h-12 mb-4 text-primary" />
+                            <p className="font-semibold">{pdfFile.name}</p>
+                            <p className="text-sm text-muted-foreground">({(pdfFile.size / 1024).toFixed(2)} KB)</p>
+                            {parseError ? (
                                 <p className="text-sm text-red-500 mt-2">Error: {parseError}</p>
-                             ) : (
+                            ) : (
                                 <div className="flex flex-col items-center mt-2">
                                     <p className="text-sm text-green-500">Successfully parsed {stagedDuties.length} duties!</p>
                                     {stagedDuties.length > 0 && (
-                                        <Button 
-                                            variant="outline" 
-                                            size="sm" 
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
                                             className="mt-2"
                                             onClick={(e) => { e.stopPropagation(); setShowOverview(!showOverview); }}
                                         >
@@ -260,15 +264,15 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                                         </Button>
                                     )}
                                 </div>
-                             )}
-                             <Button
-                                 variant="ghost"
-                                 size="sm"
-                                 className="absolute top-2 right-2"
-                                 onClick={(e) => { e.stopPropagation(); clearFile(); }}
-                             >
-                                 <X className="w-4 h-4" />
-                             </Button>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                className="absolute top-2 right-2"
+                                onClick={(e) => { e.stopPropagation(); clearFile(); }}
+                            >
+                                <X className="w-4 h-4" />
+                            </Button>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center cursor-pointer">
@@ -307,7 +311,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                     </div>
                 )}
 
-                 {/* Separator */}
+                {/* Separator */}
                 <div className="flex items-center my-4">
                     <div className="flex-grow border-t border-border"></div>
                     <span className="mx-4 text-xs font-semibold tracking-wider uppercase text-muted-foreground">OR</span>
@@ -319,7 +323,7 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
                         <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
                             <Plane className="w-16 h-16 mb-4" />
                             <p className="font-semibold text-foreground">{pdfFile ? 'No duties were parsed from the PDF.' : 'Click "Add Single Duty" to get started.'}</p>
-                            <p className="text-sm text-muted-foreground">{pdfFile ? 'Try a different PDF file.' : 'No duties have been added manually.'}</p>                           
+                            <p className="text-sm text-muted-foreground">{pdfFile ? 'Try a different PDF file.' : 'No duties have been added manually.'}</p>
                         </div>
                     ) : (
                         <div className="grid gap-4 md:grid-cols-2">
@@ -336,9 +340,13 @@ export function DutyStagingModal({ isOpen, onClose }: DutyStagingModalProps) {
 
                 <DialogFooter className="mt-auto pt-4">
                     <Dialog open={isAddFormOpen} onOpenChange={setIsAddFormOpen}>
-                         <Button variant="outline" onClick={() => setIsAddFormOpen(true)}>
+                        <Button variant="outline" onClick={() => setIsAddFormOpen(true)}>
                             <PlusCircle className="w-4 h-4 mr-2" />
                             Add Single Duty
+                        </Button>
+                        <Button variant="outline" onClick={parseIcsToDuties(readFile('/home/user/aviation-crew-swap/app/logs/ics-content-2025-07-31T19-40-00-751Z.log'))}>
+                            <PlusCircle className="w-4 h-4 mr-2" />
+                            Parse ics
                         </Button>
                         <DialogContent>
                             <DialogHeader>
