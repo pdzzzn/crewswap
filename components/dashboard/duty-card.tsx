@@ -116,14 +116,11 @@ export default function DutyCard({
               {index > 0 && <Separator />}
               <div className="p-1 rounded-lg">
                 <div className="flex items-center justify-between font-semibold text-sm">
-                  <div className="flex items-center gap-2">
-                    {leg.isDeadhead && (
-                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">DH</span>
-                    )}
-                    <span className={leg.isDeadhead ? 'text-muted-foreground' : ''}>
-                      {normalizeFlightNumber(leg.flightNumber)}
-                    </span>
-                  </div>
+                  <span className={leg.isDeadhead ? 'text-muted-foreground' : ''}>
+                    {leg.isDeadhead
+                      ? `DH/${normalizeFlightNumber(leg.flightNumber)}`
+                      : normalizeFlightNumber(leg.flightNumber)}
+                  </span>
                   <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
                     {calculateDuration(duty.date, leg.departureTime, leg.arrivalTime)}
                   </span>

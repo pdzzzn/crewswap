@@ -1,17 +1,14 @@
 
 export const dynamic = "force-dynamic";
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: Request, context: any) {
   try {
     const user = await requireAuth();
-    const { id } = params;
+    const { id } = context?.params ?? {};
     const supabase = await createClient();
 
     // Mark notification as read

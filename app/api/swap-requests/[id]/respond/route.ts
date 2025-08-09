@@ -1,18 +1,15 @@
 
 export const dynamic = "force-dynamic";
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: Request, context: any) {
   try {
     const user = await requireAuth();
     const { action, responseMessage } = await request.json();
-    const { id } = params;
+    const { id } = context?.params ?? {};
     const supabase = await createClient();
 
     if (!action || !['approve', 'deny'].includes(action)) {
@@ -62,13 +59,21 @@ export async function PATCH(
       return NextResponse.json({ error: updateError.message }, { status: 500 });
     }
 
+    // Validate duty IDs exist
+    if (!swapRequest.sender_duty_id || !swapRequest.target_duty_id) {
+      return NextResponse.json(
+        { error: 'Invalid swap request payload: missing duty IDs' },
+        { status: 400 }
+      );
+    }
+
     // If approved, swap the duties between users
     if (action === 'approve') {
       // Update sender duty to belong to receiver (current user)
       const { error: senderDutyError } = await supabase
         .from('duties')
         .update({ user_id: user.id })
-        .eq('id', swapRequest.sender_duty_id);
+        .eq('id', swapRequest.sender_duty_id as string);
 
       if (senderDutyError) {
         console.error('Update sender duty error:', senderDutyError);
@@ -79,7 +84,7 @@ export async function PATCH(
       const { error: targetDutyError } = await supabase
         .from('duties')
         .update({ user_id: swapRequest.sender_id })
-        .eq('id', swapRequest.target_duty_id);
+        .eq('id', swapRequest.target_duty_id as string);
 
       if (targetDutyError) {
         console.error('Update target duty error:', targetDutyError);

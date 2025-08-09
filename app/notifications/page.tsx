@@ -58,15 +58,17 @@ export default function NotificationsPage() {
         return;
       }
 
-      setNotifications(notifications.map(notification => ({
-        id: notification.id,
-        type: notification.type,
-        title: notification.title,
-        message: notification.message,
-        isRead: notification.is_read,
-        swapRequestId: notification.swap_request_id,
-        createdAt: notification.created_at
-      })));
+      setNotifications(
+        notifications.map((notification) => ({
+          id: notification.id,
+          type: notification.type,
+          title: notification.title,
+          message: notification.message,
+          isRead: Boolean(notification.is_read),
+          swapRequestId: notification.swap_request_id ?? undefined,
+          createdAt: notification.created_at ?? new Date().toISOString(),
+        }))
+      );
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {

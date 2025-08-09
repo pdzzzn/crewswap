@@ -25,10 +25,10 @@ import { useEffect, useRef, useState } from "react";
 const formSchema = z.object({
   airlineCode: z.string().length(2, { message: "2-letter code." }).regex(/^[A-Z0-9]{2}$/i, { message: "Invalid." }),
   flightDigits: z.string().min(1, { message: "Required." }).max(5, { message: "Max 5 digits." }).regex(/^\d+$/, { message: "Digits only." }),
-  isDeadhead: z.boolean().default(false),
+  isDeadhead: z.boolean(),
   departureLocation: z.string().length(3, { message: "Provide the 3-letter airport code." }),
   arrivalLocation: z.string().length(3, { message: "Provide the 3-letter airport code." }),
-  date: z.date({ required_error: "A date is required." }),
+  date: z.date({ error: (issue) => (issue.input === undefined ? "A date is required." : "Invalid date") }),
   departureTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: "Use HH:mm format." }),
   arrivalTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: "Use HH:mm format." }),
 });
