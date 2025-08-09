@@ -26,17 +26,59 @@ export default function DutyCard({
 }: DutyCardProps) {
   const [showSwapModal, setShowSwapModal] = useState(false);
 
-  // Use parseISO to handle ISO strings correctly
-  const formatTime = (timeString: string) => format(parseISO(timeString), 'HH:mm');
+  // Robust date/time handling for either ISO strings or HH:mm times
+  const parseDateTime = (dateString: string, timeString?: string) => {
+    if (!timeString) return null;
+    const t = timeString.trim();
+    try {
+      if (t.includes('T')) {
+        const d = parseISO(t);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      if (/^\d{2}:\d{2}$/.test(t)) {
+        const d = parseISO(`${dateString}T${t}:00Z`);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      if (/^\d{2}:\d{2}:\d{2}$/.test(t)) {
+        const d = parseISO(`${dateString}T${t}Z`);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      const d = new Date(t);
+      return isNaN(d.getTime()) ? null : d;
+    } catch {
+      return null;
+    }
+  };
+
+  const formatTime = (dateString: string, timeString?: string) => {
+    if (!timeString) return '—';
+    const t = timeString.trim();
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(t) && !t.includes('T')) {
+      // Already an HH:mm or HH:mm:ss string – display HH:mm
+      return t.slice(0, 5);
+    }
+    const d = parseDateTime(dateString, timeString);
+    return d ? format(d, 'HH:mm') : '—';
+  };
+
   const formatDate = (dateString: string) => format(parseISO(dateString), 'MMM dd, yyyy');
 
-  const calculateDuration = (departure: string, arrival: string) => {
-    const dep = parseISO(departure);
-    const arr = parseISO(arrival);
+  const calculateDuration = (dateString: string, departure?: string, arrival?: string) => {
+    const dep = parseDateTime(dateString, departure);
+    const arr = parseDateTime(dateString, arrival);
+    if (!dep || !arr) return '—';
     const diffMs = arr.getTime() - dep.getTime();
+    if (!isFinite(diffMs)) return '—';
     const hours = Math.floor(diffMs / 3600000);
     const minutes = Math.floor((diffMs % 3600000) / 60000);
     return `${hours}h ${minutes > 0 ? `${minutes}m` : ''}`;
+  };
+
+  // Ensure we never render DH/DH/… by stripping any pre-existing DH prefix from the source value.
+  const normalizeFlightNumber = (flightNumber?: string) => {
+    if (!flightNumber) return '';
+    // Remove one or more leading DH + separator sequences (e.g., DH/, DH - , DH DH/)
+    return flightNumber.replace(/^(?:DH[\s\/\-]+)+/i, '').trim();
   };
 
   return (
@@ -74,22 +116,27 @@ export default function DutyCard({
               {index > 0 && <Separator />}
               <div className="p-1 rounded-lg">
                 <div className="flex items-center justify-between font-semibold text-sm">
-                  <span className={leg.isDeadhead ? 'text-muted-foreground' : ''}>
-                    {leg.isDeadhead ? `DH/${leg.flightNumber}` : leg.flightNumber}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {leg.isDeadhead && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-300">DH</span>
+                    )}
+                    <span className={leg.isDeadhead ? 'text-muted-foreground' : ''}>
+                      {normalizeFlightNumber(leg.flightNumber)}
+                    </span>
+                  </div>
                   <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/10 text-primary">
-                    {calculateDuration(leg.departureTime, leg.arrivalTime)}
+                    {calculateDuration(duty.date, leg.departureTime, leg.arrivalTime)}
                   </span>
                 </div>
                 {/* Compacted layout for departure and arrival info */}
                 <div className="flex items-center justify-between text-xs text-muted-foreground mt-1 gap-1">
-                  <span>{formatTime(leg.departureTime)}</span>
+                  <span>{formatTime(duty.date, leg.departureTime)}</span>
                   <div className="flex items-center gap-1 font-medium text-foreground">
                     <span>{leg.departureLocation}</span>
                     <ArrowRight className="h-3 w-3 text-muted-foreground" />
                     <span>{leg.arrivalLocation}</span>
                   </div>
-                  <span>{formatTime(leg.arrivalTime)}</span>
+                  <span>{formatTime(duty.date, leg.arrivalTime)}</span>
                 </div>
               </div>
             </Fragment>

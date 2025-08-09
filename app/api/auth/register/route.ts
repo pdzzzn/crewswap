@@ -2,13 +2,12 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { hashPassword, generateToken } from '@/lib/auth';
-import { cookies } from 'next/headers';
+import { createClient } from '@/lib/supabase-server';
 
 export async function POST(request: NextRequest) {
   try {
     const { name, email, password, role, base } = await request.json();
+    const supabase = await createClient();
 
     // Validation
     if (!name || !email || !password || !role || !base) {
@@ -25,51 +24,70 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { email }
+    // Create user with Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          name,
+          role,
+          base
+        }
+      }
     });
 
-    if (existingUser) {
+    if (authError) {
+      console.error('Auth signup error:', authError);
+      if (authError.message.includes('already registered')) {
+        return NextResponse.json(
+          { error: 'User already exists with this email' },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: 'User already exists with this email' },
+        { error: authError.message },
         { status: 400 }
       );
     }
 
-    // Create user
-    const hashedPassword = await hashPassword(password);
-    const user = await prisma.user.create({
-      data: {
+    if (!authData.user) {
+      return NextResponse.json(
+        { error: 'Failed to create user' },
+        { status: 500 }
+      );
+    }
+
+    // Create user profile in users table
+    const { data: userProfile, error: profileError } = await supabase
+      .from('users')
+      .insert({
+        id: authData.user.id,
         name,
         email,
-        password: hashedPassword,
         role,
-        base, // <-- Add base to the create data
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        base: true, // <-- Add base to the select data
-        isAdmin: true,
-      }
-    });
+        base,
+        is_admin: false
+      })
+      .select()
+      .single();
 
-    // Generate token and set cookie
-    const token = generateToken({ userId: user.id });
-    const cookieStore = await cookies();
-    cookieStore.set('auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-    });
+    if (profileError) {
+      console.error('Profile creation error:', profileError);
+      // If profile creation fails, we should clean up the auth user
+      // but for now, we'll just log the error
+    }
 
     return NextResponse.json({
       message: 'User created successfully',
-      user
+      user: {
+        id: authData.user.id,
+        name,
+        email,
+        role,
+        base,
+        isAdmin: false
+      }
     });
   } catch (error) {
     console.error('Registration error:', error);

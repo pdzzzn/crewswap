@@ -6,6 +6,7 @@ import Header from "@/components/layout/header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, Plane, Users, BarChart3 } from "lucide-react";
 import { User } from "@/lib/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
@@ -15,33 +16,25 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import data from "./data.json";
 
 export default function AdminDashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch("/api/auth/me");
-        if (response.ok) {
-          const data = await response.json();
-          if (data.user && data.user.isAdmin) {
-            setUser(data.user);
-          } else {
-            router.push("/dashboard");
-          }
-        } else {
-          router.push("/login");
-        }
-      } catch (error) {
-        console.error("Failed to fetch user data:", error);
-        router.push("/login");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchUser();
-  }, [router]);
+    if (!loading && !user) {
+      router.push("/login");
+      return;
+    }
+
+    if (!loading && user && !user.isAdmin) {
+      router.push("/dashboard");
+      return;
+    }
+
+    if (user && user.isAdmin) {
+      setIsLoading(false);
+    }
+  }, [user, loading, router]);
 
   if (isLoading || !user) {
     return (
@@ -60,7 +53,6 @@ export default function AdminDashboardPage() {
     <div className="h-screen bg-background flex flex-col">
       <Header user={user} />
 
-      {/* This is the key change: adding 'overflow-hidden' */}
       <div className="flex flex-1 overflow-hidden transform-gpu">
         <SidebarProvider
           style={

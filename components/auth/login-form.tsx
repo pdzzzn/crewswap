@@ -1,14 +1,14 @@
-
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Plane, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginForm() {
   const [email, setEmail] = useState('');
@@ -16,7 +16,17 @@ export default function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirectTo') || undefined;
   const { toast } = useToast();
+  const { user, signIn } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      router.push(redirectTo || '/dashboard');
+    }
+  }, [user, router, redirectTo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,22 +34,16 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      const { error } = await signIn(email, password);
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (error) {
+        setError(error.message);
+      } else {
         toast({
           title: 'Welcome back!',
           description: 'Successfully signed in to your account.',
         });
-        router.push('/dashboard');
-      } else {
-        setError(data.error || 'Login failed');
+        router.push(redirectTo || '/dashboard');
       }
     } catch (error) {
       setError('An error occurred. Please try again.');

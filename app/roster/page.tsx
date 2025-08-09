@@ -1,421 +1,118 @@
-'use client';
+export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useMemo, useRef, useLayoutEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
-import { Calendar, Plane, PlusCircle } from 'lucide-react';
-import Header from '@/components/layout/header';
-import DutyCard from '@/components/dashboard/duty-card';
-import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
-import { Button } from '@/components/ui/button';
-import { DutyStagingModal } from '@/components/roster/duty-staging-modal';
-import { User, Duty, roles } from '@/lib/types';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import RosterPageClient from '@/components/roster/roster-page-client';
+import { requireAuth } from '@/lib/auth';
+import { createClient } from '@/lib/supabase-server';
+import type { Duty as DutyType, User as UserType } from '@/lib/types';
+import { format as formatDate } from 'date-fns';
 
-export default function RosterPage() {
-  // --- STATE AND REFS ---
-  const [user, setUser] = useState<User | null>(null);
-  const [duties, setDuties] = useState<Duty[]>([]);
-  const [availableDuties, setAvailableDuties] = useState<Duty[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isStagingModalOpen, setIsStagingModalOpen] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("");
-  const router = useRouter();
+// Server-side data types and mappers
+type DbUser = {
+  id: string;
+  name: string;
+  role: string;
+  email: string;
+  is_admin: boolean | null;
+};
 
-  // Refs for scroll synchronization and targeting specific date columns
-  const topScrollRef = useRef<HTMLDivElement>(null);
-  const bottomScrollRef = useRef<HTMLDivElement>(null);
-  const scrollSyncRef = useRef<'top' | 'bottom' | null>(null);
-  const dateColumnRefs = useRef<Map<string, HTMLDivElement | null>>(new Map());
+type DbLeg = {
+  id: string;
+  flight_number: string;
+  departure_time: string;
+  arrival_time: string;
+  departure_location: string;
+  arrival_location: string;
+  is_deadhead: boolean | null;
+};
 
+type DbDuty = {
+  id: string;
+  date: string;
+  pairing: string | null;
+  user: DbUser | null;
+  legs: DbLeg[] | null;
+};
 
-  // --- DATA FETCHING & LOGIC ---
-
-  // Effect to fetch all necessary data once when the component mounts
-  useEffect(() => {
-    const fetchAllData = async () => {
-      setIsLoading(true);
-      try {
-        const [userDataRes, dutiesRes, availableDutiesRes] = await Promise.all([
-          fetch('/api/auth/me'),
-          fetch('/api/duties'),
-          fetch('/api/duties/available')
-        ]);
-
-        if (!userDataRes.ok) {
-          router.push('/login');
-          return;
-        }
-
-        const userData = await userDataRes.json();
-        setUser(userData.user);
-
-        const dutiesData = await dutiesRes.json();
-        setDuties(dutiesData.duties || []);
-
-        const availableDutiesData = await availableDutiesRes.json();
-        setAvailableDuties(availableDutiesData.duties || []);
-
-      } catch (error) {
-        console.error('Failed to fetch roster data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchAllData();
-  }, [router]); // Dependency on router to adhere to React hooks linting rules
-
-  // Effect to set the initial role in the dropdown once user data is available
-  useEffect(() => {
-    if (user?.role) {
-      setSelectedRole(user.role);
-    }
-  }, [user]);
-
-
-
-
-  // Memoized client-side filtering of available duties based on the selected role
-  const filteredAvailableDuties = useMemo(() => {
-    if (selectedRole === 'allDuties' || !selectedRole) {
-      return availableDuties;
-    }
-    return availableDuties.filter(duty => duty.user?.role === selectedRole);
-  }, [availableDuties, selectedRole]);
-
-  // NEW: Memoized grouping of available duties by user, then by date.
-  const dutiesByUser = useMemo(() => {
-    const grouped = new Map<string, Map<string, Duty>>();
-
-    filteredAvailableDuties.forEach(duty => {
-      // Ensure the duty has a user and a user ID.
-      if (!duty.user || !duty.user.id) {
-        return;
-      }
-
-      const userId = duty.user.id;
-      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-
-      // If we haven't seen this user before, create a new map for them.
-      if (!grouped.has(userId)) {
-        grouped.set(userId, new Map<string, Duty>());
-      }
-
-      // Add the duty to the user's personal schedule map.
-      grouped.get(userId)!.set(dateKey, duty);
-    });
-
-    return grouped;
-  }, [filteredAvailableDuties]); // This recalculates only when the filtered duties change.
-
-  // Memoized grouping of duties for rendering, recalculated when filtered duties change
-  const groupedDuties = useMemo(() => {
-    const grouped = new Map<string, { userDuty: Duty | null; availableDuties: Duty[] }>();
-    const allDutiesForDates = [...duties, ...filteredAvailableDuties];
-
-    // If there are no duties at all, return an empty map.
-    if (allDutiesForDates.length === 0) {
-      return grouped;
-    }
-
-    // 1. Find the date range
-    const dateTimestamps = allDutiesForDates.map(d => new Date(d.date).getTime());
-    const minDate = new Date(Math.min(...dateTimestamps));
-    const maxDate = new Date(Math.max(...dateTimestamps));
-
-    // 2. Generate a continuous array of dates
-    const allDates = [];
-    let currentDate = new Date(minDate);
-    // Set to midnight UTC to avoid timezone issues during iteration
-    currentDate.setUTCHours(0, 0, 0, 0);
-
-    while (currentDate <= maxDate) {
-      allDates.push(format(currentDate, 'yyyy-MM-dd'));
-      currentDate.setDate(currentDate.getDate() + 1);
-    }
-
-    // 3. Use the new continuous date array to build the map
-    allDates.forEach(date => grouped.set(date, { userDuty: null, availableDuties: [] }));
-
-    duties.forEach(duty => {
-      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-      const entry = grouped.get(dateKey);
-      if (entry) entry.userDuty = duty;
-    });
-
-    filteredAvailableDuties.forEach(duty => {
-      const dateKey = format(new Date(duty.date), 'yyyy-MM-dd');
-      const entry = grouped.get(dateKey);
-      // This check is important because a duty might be outside the filtered range of other duties
-      if (entry) entry.availableDuties.push(duty);
-    });
-
-    return grouped;
-  }, [duties, filteredAvailableDuties]);
-
-
-  const dateKeys = Array.from(groupedDuties.keys());
-
-  // Effect to scroll to today's date once the initial data load is complete
-  useEffect(() => {
-    if (isLoading) return; // Only run after loading is finished
-
-    const todayKey = format(new Date(), 'yyyy-MM-dd');
-    const todayEl = dateColumnRefs.current.get(todayKey);
-
-    if (todayEl && topScrollRef.current && bottomScrollRef.current) {
-      const scrollPosition = todayEl.offsetLeft;
-      // Timeout ensures the DOM has fully painted before we scroll
-      setTimeout(() => {
-        topScrollRef.current?.scrollTo({ left: scrollPosition, behavior: 'smooth' });
-        bottomScrollRef.current?.scrollTo({ left: scrollPosition, behavior: 'smooth' });
-      }, 100);
-    }
-  }, [isLoading]);
-
-  // --- HANDLERS ---
-  const handleSwapRequested = () => {
-    // Here you would re-fetch or update state after a swap
-    // For now, it can be left empty or log a message
-    console.log("Swap requested, data should be refreshed.");
+function mapUser(u: DbUser): UserType {
+  return {
+    id: u.id,
+    name: u.name,
+    email: u.email,
+    role: u.role,
+    isAdmin: u.is_admin ?? false,
   };
+}
 
-  const handleScroll = (source: 'top' | 'bottom') => {
-    if (scrollSyncRef.current !== source) return;
-
-    if (source === 'top' && topScrollRef.current && bottomScrollRef.current) {
-      bottomScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
-    }
-    if (source === 'bottom' && topScrollRef.current && bottomScrollRef.current) {
-      topScrollRef.current.scrollLeft = bottomScrollRef.current.scrollLeft;
-    }
+function mapLeg(l: DbLeg) {
+  return {
+    id: l.id,
+    flightNumber: l.flight_number,
+    departureTime: l.departure_time,
+    arrivalTime: l.arrival_time,
+    departureLocation: l.departure_location,
+    arrivalLocation: l.arrival_location,
+    isDeadhead: l.is_deadhead ?? false,
   };
+}
+
+function mapDuty(d: DbDuty): DutyType {
+  return {
+    id: d.id,
+    date: d.date,
+    pairing: d.pairing,
+    user: d.user ? mapUser(d.user) : undefined,
+    legs: (d.legs ?? []).map(mapLeg),
+  };
+}
+
+export default async function RosterPage() {
+  const authUser = await requireAuth('/roster');
+  const supabase = await createClient();
+
+  const select = `
+    id, date, pairing,
+    user:users!duties_user_id_fkey(id, name, role, email, is_admin),
+    legs:flight_legs!flight_legs_duty_id_fkey(
+      id, flight_number, departure_time, arrival_time,
+      departure_location, arrival_location, is_deadhead
+    )
+  `;
+
+  const today = formatDate(new Date(), 'yyyy-MM-dd');
+
+  const [userDutiesRes, availableRes] = await Promise.all([
+    supabase
+      .from('duties')
+      .select(select)
+      .eq('user_id', authUser.id)
+      .order('date', { ascending: true })
+      .order('departure_time', { ascending: true, foreignTable: 'flight_legs' }),
+    supabase
+      .from('duties')
+      .select(select)
+      .neq('user_id', authUser.id)
+      .gte('date', today)
+      .order('date', { ascending: true })
+      .order('departure_time', { ascending: true, foreignTable: 'flight_legs' }),
+  ]);
 
 
-  useLayoutEffect(() => {
-    // Only run this logic when the data is loaded and has been rendered
-    if (isLoading || !topScrollRef.current || !bottomScrollRef.current) {
-      return;
-    }
+  const duties: DutyType[] = (userDutiesRes.data ?? []).map(mapDuty as (d: any) => DutyType);
+  const availableDuties: DutyType[] = (availableRes.data ?? []).map(mapDuty as (d: any) => DutyType);
 
-    const topContainer = topScrollRef.current;
-    const bottomContainer = bottomScrollRef.current;
-
-    // A function to run the synchronization
-    const syncHeights = () => {
-      dateKeys.forEach(dateKey => {
-        // Find all card containers (the direct parents of DutyCard or "No Duty" placeholder) for this date
-        const topCardWrapper = topContainer.querySelector(`[data-date-key="${dateKey}"]`);
-        const bottomCardWrappers = bottomContainer.querySelectorAll(`[data-date-key="${dateKey}"]`);
-
-        const elements = [topCardWrapper, ...Array.from(bottomCardWrappers)].filter(Boolean);
-
-        if (elements.length === 0) return;
-
-        // Reset heights to auto before measuring to get their natural height
-        elements.forEach(el => {
-          if (el instanceof HTMLElement) {
-            el.style.minHeight = 'auto';
-          }
-        });
-
-        // Give the browser a moment to apply the 'auto' height
-        requestAnimationFrame(() => {
-          let maxHeight = 0;
-          elements.forEach(el => {
-            if (el instanceof HTMLElement) {
-              // Use scrollHeight to get the full content height
-              if (el.scrollHeight > maxHeight) {
-                maxHeight = el.scrollHeight;
-              }
-            }
-          });
-
-          // Apply the tallest height to all elements in that column, but only if it's a meaningful height
-          if (maxHeight > 90) { // Using 90px as a baseline from your "No Duty" min-height
-            elements.forEach(el => {
-              if (el instanceof HTMLElement) {
-                el.style.minHeight = `${maxHeight}px`;
-              }
-            });
-          }
-        });
-      });
-    };
-
-    // Run synchronization. The timeout helps ensure all rendering is complete.
-    const timer = setTimeout(syncHeights, 100);
-
-    // Cleanup function
-    return () => clearTimeout(timer);
-
-    // Rerun this effect whenever the data that affects the layout changes
-  }, [isLoading, duties, filteredAvailableDuties, dateKeys]);
-
-  // --- RENDER LOGIC ---
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <Plane className="w-10 h-10 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground text-lg font-medium">Loading Duty Roster...</p>
-        </div>
-      </div>
-    );
-  }
-
+  const user: UserType = {
+    id: authUser.id,
+    email: authUser.email,
+    name: authUser.name,
+    role: authUser.role,
+    isAdmin: authUser.isAdmin,
+  };
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <Header user={user} />
-
-      <main className="w-full px-4 py-8 flex-1 flex flex-col">
-        <CardHeader className="px-0 flex flex-row items-center justify-between">
-          <div className="space-y-1">
-            <CardTitle className="flex items-center gap-2 text-2xl">
-              <Calendar className="w-6 h-6" />
-              Duty Roster
-            </CardTitle>
-            <CardDescription>
-              Your schedule is fixed at the top. Available swaps are shown below, aligned by date.
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-4">
-            <Select value={selectedRole} onValueChange={setSelectedRole}>
-              <SelectTrigger className="w-[180px] justify-center">
-                <SelectValue placeholder="Select a role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value={roles[0].value}>{roles[0].label}</SelectItem>
-                  <SelectItem value={roles[1].value}>{roles[1].label}</SelectItem>
-                  <SelectItem value={roles[2].value}>{roles[2].label}</SelectItem>
-                  <SelectItem value={roles[3].value}>{roles[3].label}</SelectItem>
-                  <SelectItem value="allDuties">All Roles</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" onClick={() => setIsStagingModalOpen(true)}>
-              <PlusCircle className="w-4 h-4 mr-2" />
-              Add Duties
-            </Button>
-          </div>
-        </CardHeader>
-
-        {/* Your Duties Section */}
-        <div className="sticky top-16 bg-background/10 backdrop-blur-none z-20 py-4">
-          <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Your Schedule</h3>
-          <div
-            ref={topScrollRef}
-            className="flex overflow-x-auto space-x-4 pb-2 scrollbar-hide"
-            onScroll={() => handleScroll('top')}
-            onMouseEnter={() => scrollSyncRef.current = 'top'}
-          >
-            {dateKeys.map(dateKey => (
-              <div
-                key={dateKey}
-                className="w-72 flex-shrink-0"
-                ref={(el) => {
-                  if (el) {
-                    dateColumnRefs.current.set(dateKey, el);
-                  } else {
-                    // Clean up the map when the component unmounts
-                    dateColumnRefs.current.delete(dateKey);
-                  }
-                }}
-              >
-                <div className="text-center font-semibold text-sm text-muted-foreground pb-2 border-b-2 ">
-                  {format(new Date(dateKey.replace(/-/g, '/')), 'EEE dd MMM').toUpperCase()}
-                </div>
-                <div className="grid pt-3 pl-1" data-date-key={dateKey}>
-                  {groupedDuties.get(dateKey)?.userDuty ? (
-                    <DutyCard
-                      duty={groupedDuties.get(dateKey)!.userDuty!}
-                      showSwapButton={false}
-                      onSwapRequested={handleSwapRequested}
-                    />
-                  ) : (
-                    <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground">
-                      <p className="text-muted-foreground font-medium">No Duty</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Separator className="my-6" />
-
-        {/* Available Duties Section */}
-        {/* --- MODIFIED: Available Duties Section --- */}
-        <div className="flex-1 flex flex-col min-h-0">
-          <h3 className="text-lg font-semibold text-foreground mb-2 px-1">Available Swaps</h3>
-          <Card className="flex-1 flex flex-col border-2 border-border rounded-lg overflow-hidden">
-            <CardContent
-              ref={bottomScrollRef}
-              className="flex-1 overflow-x-auto h-full overflow-auto scrollbar-hide p-0 bg-background" style={{ paddingTop: '0', paddingLeft: '-10px' }}
-              onScroll={() => handleScroll('bottom')}
-              onMouseEnter={() => scrollSyncRef.current = 'bottom'}
-            >
-              <div className="grid gap-4">
-                {/* Loop over each USER to create a row */}
-                {Array.from(dutiesByUser.keys()).map(userId => {
-                  const userDutiesMap = dutiesByUser.get(userId)!;
-                  // Get the first duty to display the user's name
-                  const representativeDuty = userDutiesMap.values().next().value;
-
-                  return (
-                    <div key={userId}>
-                      {/* Optional: Add a header for each user's row */}
-                      <h4 className="text-md font-semibold text-foreground mb-2">
-                        {representativeDuty?.user?.name || `User ${userId}`}
-                      </h4>
-
-                      {/* This flex container is the USER'S ROW */}
-                      <div className="flex space-x-4">
-                        {/* Loop over each DATE to create a column */}
-                        {dateKeys.map(dateKey => (
-                          <div key={dateKey} className="w-72 flex-shrink-0" data-date-key={dateKey}>
-                            {/* POTENTIALLY MAKE THE WIDTH A VARIABLE */}
-                            {userDutiesMap.has(dateKey) ? (
-                              // If the user has a duty on this date, show it
-                              <DutyCard
-                                duty={userDutiesMap.get(dateKey)!}
-                                onSwapRequested={handleSwapRequested}
-                              />
-                            ) : (
-                              // Otherwise, show a placeholder to keep alignment
-                              <div className="h-full flex items-center justify-center rounded-lg bg-muted/60 border-2 border-dashed border-muted-foreground">
-                                <p className="text-muted-foreground font-medium">No Duty</p>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Placeholder for when no duties match the filter */}
-              {dutiesByUser.size === 0 && (
-                <div className="text-center py-12 w-full flex flex-col items-center justify-center h-full">
-                  <Plane className="w-16 h-16 text-muted-foreground/30 mx-auto mb-4" />
-                  <h3 className="text-xl font-medium text-foreground mb-2">No Duties Found</h3>
-                  <p className="text-muted-foreground">There are no available duties matching your filter.</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-        <DutyStagingModal
-          isOpen={isStagingModalOpen}
-          onClose={() => setIsStagingModalOpen(false)}
-        />
-      </main>
-    </div>
+    <RosterPageClient
+      user={user}
+      duties={duties}
+      availableDuties={availableDuties}
+    />
+    
   );
 }

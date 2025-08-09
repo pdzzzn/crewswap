@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { logToFile, logIcsContent, logParsedDuties } from '@/lib/logger';
+import { parseIcsToDuties } from '@/lib/ics';
+import type { ParsedDuty } from '@/lib/ics';
 import path from 'path';
 import FormData from 'form-data';
 
@@ -17,18 +19,7 @@ interface ParsedFile {
     originalname: string;
 }
 
-/**
- * A helper type for parsed duty data.
- */
-interface ParsedDuty {
-    id: string;
-    date: string;
-    flightNumber: string;
-    departureTime: string;
-    arrivalTime: string;
-    departureLocation: string;
-    arrivalLocation: string;
-}
+// Using ParsedDuty type from '@/lib/ics' for a single source of truth
 
 /**
  * Processes the FormData from the request to extract the uploaded file.
@@ -56,78 +47,7 @@ async function processFile(request: NextRequest): Promise<ParsedFile | null> {
  * @param icsContent The content of the .ics file as a string.
  * @returns An array of parsed duty objects.
  */
-export function parseIcsToDuties(icsContent: string): ParsedDuty[] {
-    // This is a simplified parser - in a real implementation, you would need
-    // a proper .ics parser to extract the duty information
-    logToFile('Parsing .ics file content:', 'parsing.log');
-    logToFile(icsContent, 'ics-content.log');
-    logToFile('End of .ics file content', 'parsing.log');
-    
-    const duties: ParsedDuty[] = [];
-    
-    // Split the content into lines
-    const lines = icsContent.split('\n');
-    
-    // Simple parsing logic - this would need to be expanded for a real implementation
-    let currentDuty: Partial<ParsedDuty> | null = null;
-    let eventId = 0;
-    
-    for (const line of lines) {
-        if (line.startsWith('BEGIN:VEVENT')) {
-            currentDuty = {};
-            logToFile('Starting to parse new event', 'parsing.log');
-        } else if (line.startsWith('END:VEVENT') && currentDuty) {
-            // Add the completed duty to our array
-            const newDuty: ParsedDuty = {
-                id: `parsed-${eventId++}`,
-                date: currentDuty.date || new Date().toISOString(),
-                flightNumber: currentDuty.flightNumber || 'Unknown',
-                departureTime: currentDuty.departureTime || new Date().toISOString(),
-                arrivalTime: currentDuty.arrivalTime || new Date().toISOString(),
-                departureLocation: currentDuty.departureLocation || 'Unknown',
-                arrivalLocation: currentDuty.arrivalLocation || 'Unknown',
-            };
-            
-            logToFile(`Parsed duty: ${JSON.stringify(newDuty)}`, 'parsing.log');
-            duties.push(newDuty);
-            currentDuty = null;
-        } else if (currentDuty) {
-            // Parse event properties
-            if (line.startsWith('SUMMARY:')) {
-                const summary = line.substring(8);
-                logToFile(`Processing SUMMARY: ${summary}`, 'parsing.log');
-                // Extract flight number from summary (simplified)
-                const flightMatch = summary.match(/([A-Z]{2}\d{1,4})/);
-                if (flightMatch) {
-                    currentDuty.flightNumber = flightMatch[1];
-                    logToFile(`Extracted flight number: ${currentDuty.flightNumber}`, 'parsing.log');
-                }
-            } else if (line.startsWith('DTSTART:')) {
-                const time = line.split("T")[1].substring(0, 5);
-                currentDuty.departureTime = time;
-                logToFile(`Departure time: ${currentDuty.departureTime}`, 'parsing.log');
-                currentDuty.date = line.substring(8, 16); // Extract date part
-                logToFile(`Date: ${currentDuty.date}`, 'parsing.log');
-            } else if (line.startsWith('DTEND:')) {
-                currentDuty.arrivalTime = line.substring(6);
-                logToFile(`Arrival time: ${currentDuty.arrivalTime}`, 'parsing.log');
-            } else if (line.startsWith('LOCATION:')) {
-                const location = line.substring(9);
-                logToFile(`Processing LOCATION: ${location}`, 'parsing.log');
-                // Split location into departure and arrival (simplified)
-                const locations = location.split(' - ');
-                if (locations.length >= 2) {
-                    currentDuty.departureLocation = locations[0];
-                    currentDuty.arrivalLocation = locations[1];
-                    logToFile(`Departure location: ${currentDuty.departureLocation}`, 'parsing.log');
-                    logToFile(`Arrival location: ${currentDuty.arrivalLocation}`, 'parsing.log');
-                }
-            }
-        }
-    }
-    
-    return duties;
-}
+// Using shared parseIcsToDuties from '@/lib/ics'
 
 /**
  * Handles the POST request to convert the uploaded PDF roster.
@@ -178,7 +98,7 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
         });
 
         // --- Step 4: Parse the .ics file and return duties as JSON ---
-        logToFile('Step 4: Parsing .ics file to duties...', 'parsing.log');
+        logToFile('Step 4: Parsing file to duties...', 'parsing.log');
         logIcsContent(fileResponse.data);
         const duties = parseIcsToDuties(fileResponse.data);
         

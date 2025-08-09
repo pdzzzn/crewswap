@@ -2,32 +2,47 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   try {
     const user = await requireAuth();
+    const supabase = await createClient();
 
-    const sentRequests = await prisma.swapRequest.findMany({
-      where: { senderId: user.id },
-      include: {
-        receiver: { select: { id: true, name: true, role: true } },
-        senderDuty: true,
-        targetDuty: true,
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    // Get sent requests
+    const { data: sentRequests, error: sentError } = await supabase
+      .from('swap_requests')
+      .select(`
+        *,
+        receiver:users!receiver_id(id, name, role),
+        sender_duty:duties!sender_duty_id(*),
+        target_duty:duties!target_duty_id(*)
+      `)
+      .eq('sender_id', user.id)
+      .order('created_at', { ascending: false });
 
-    const receivedRequests = await prisma.swapRequest.findMany({
-      where: { receiverId: user.id },
-      include: {
-        sender: { select: { id: true, name: true, role: true } },
-        senderDuty: true,
-        targetDuty: true,
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    if (sentError) {
+      console.error('Fetch sent requests error:', sentError);
+      return NextResponse.json({ error: sentError.message }, { status: 500 });
+    }
+
+    // Get received requests
+    const { data: receivedRequests, error: receivedError } = await supabase
+      .from('swap_requests')
+      .select(`
+        *,
+        sender:users!sender_id(id, name, role),
+        sender_duty:duties!sender_duty_id(*),
+        target_duty:duties!target_duty_id(*)
+      `)
+      .eq('receiver_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (receivedError) {
+      console.error('Fetch received requests error:', receivedError);
+      return NextResponse.json({ error: receivedError.message }, { status: 500 });
+    }
 
     return NextResponse.json({ sentRequests, receivedRequests });
   } catch (error) {
@@ -49,6 +64,7 @@ export async function POST(request: NextRequest) {
   try {
     const user = await requireAuth();
     const { senderDutyId, targetDutyId, receiverId, message } = await request.json();
+    const supabase = await createClient();
 
     if (!senderDutyId || !targetDutyId || !receiverId) {
       return NextResponse.json(
@@ -58,11 +74,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the sender owns the sender duty
-    const senderDuty = await prisma.duty.findFirst({
-      where: { id: senderDutyId, userId: user.id }
-    });
+    const { data: senderDuty, error: senderDutyError } = await supabase
+      .from('duties')
+      .select('*')
+      .eq('id', senderDutyId)
+      .eq('user_id', user.id)
+      .single();
 
-    if (!senderDuty) {
+    if (senderDutyError || !senderDuty) {
       return NextResponse.json(
         { error: 'Invalid sender duty' },
         { status: 400 }
@@ -70,11 +89,14 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the target duty exists and belongs to the receiver
-    const targetDuty = await prisma.duty.findFirst({
-      where: { id: targetDutyId, userId: receiverId }
-    });
+    const { data: targetDuty, error: targetDutyError } = await supabase
+      .from('duties')
+      .select('*')
+      .eq('id', targetDutyId)
+      .eq('user_id', receiverId)
+      .single();
 
-    if (!targetDuty) {
+    if (targetDutyError || !targetDuty) {
       return NextResponse.json(
         { error: 'Invalid target duty' },
         { status: 400 }
@@ -82,15 +104,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Check for existing pending request between same duties
-    const existingRequest = await prisma.swapRequest.findFirst({
-      where: {
-        senderDutyId,
-        targetDutyId,
-        status: 'PENDING'
-      }
-    });
+    const { data: existingRequest, error: existingError } = await supabase
+      .from('swap_requests')
+      .select('*')
+      .eq('sender_duty_id', senderDutyId)
+      .eq('target_duty_id', targetDutyId)
+      .eq('status', 'PENDING')
+      .single();
 
-    if (existingRequest) {
+    if (existingRequest && !existingError) {
       return NextResponse.json(
         { error: 'A swap request already exists for these duties' },
         { status: 400 }
@@ -98,26 +120,40 @@ export async function POST(request: NextRequest) {
     }
 
     // Create swap request
-    const swapRequest = await prisma.swapRequest.create({
-      data: {
-        senderId: user.id,
-        receiverId,
-        senderDutyId,
-        targetDutyId,
+    const { data: swapRequest, error: swapError } = await supabase
+      .from('swap_requests')
+      .insert({
+        sender_id: user.id,
+        receiver_id: receiverId,
+        sender_duty_id: senderDutyId,
+        target_duty_id: targetDutyId,
         message: message || null,
-      }
-    });
+        status: 'PENDING'
+      })
+      .select()
+      .single();
+
+    if (swapError) {
+      console.error('Create swap request error:', swapError);
+      return NextResponse.json({ error: swapError.message }, { status: 500 });
+    }
 
     // Create notification for receiver
-    await prisma.notification.create({
-      data: {
-        userId: receiverId,
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: receiverId,
         type: 'SWAP_REQUEST_RECEIVED',
         title: 'New Swap Request',
         message: `${user.name} wants to swap duties with you`,
-        swapRequestId: swapRequest.id,
-      }
-    });
+        swap_request_id: swapRequest.id,
+        is_read: false
+      });
+
+    if (notificationError) {
+      console.error('Create notification error:', notificationError);
+      // Don't fail the request if notification creation fails
+    }
 
     return NextResponse.json({
       message: 'Swap request sent successfully',

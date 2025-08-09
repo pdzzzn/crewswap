@@ -2,31 +2,30 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   try {
     const user = await requireAuth();
+    const supabase = await createClient();
 
     // Get duties from other users that are available for swap
-    const duties = await prisma.duty.findMany({
-      where: {
-        userId: { not: user.id }, // Exclude current user's duties
-        date: { gte: new Date() }, // Only future duties
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            role: true,
-          }
-        },
-        legs: true,
-      },
-      orderBy: { date: 'asc' }
-    });
+    const { data: duties, error } = await supabase
+      .from('duties')
+      .select(`
+        *,
+        user:users!user_id(id, name, role),
+        legs(*)
+      `)
+      .neq('user_id', user.id) // Exclude current user's duties
+      .gte('date', new Date().toISOString()) // Only future duties
+      .order('date', { ascending: true });
+
+    if (error) {
+      console.error('Fetch available duties error:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
 
     return NextResponse.json({ duties });
   } catch (error) {

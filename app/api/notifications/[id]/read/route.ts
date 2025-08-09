@@ -2,7 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
 export async function PATCH(
@@ -12,23 +12,26 @@ export async function PATCH(
   try {
     const user = await requireAuth();
     const { id } = params;
+    const supabase = await createClient();
 
     // Mark notification as read
-    const notification = await prisma.notification.updateMany({
-      where: {
-        id,
-        userId: user.id
-      },
-      data: {
-        isRead: true
-      }
-    });
+    const { data: notification, error } = await supabase
+      .from('notifications')
+      .update({ is_read: true })
+      .eq('id', id)
+      .eq('user_id', user.id)
+      .select()
+      .single();
 
-    if (notification.count === 0) {
-      return NextResponse.json(
-        { error: 'Notification not found' },
-        { status: 404 }
-      );
+    if (error) {
+      console.error('Update notification error:', error);
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: 'Notification not found' },
+          { status: 404 }
+        );
+      }
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Notification marked as read' });

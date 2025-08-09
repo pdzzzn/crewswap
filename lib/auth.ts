@@ -1,63 +1,40 @@
-
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
-import { prisma } from './db';
-
-const JWT_SECRET = process.env.JWT_SECRET || 'aviation-crew-swap-secret-key';
+import { createClient } from './supabase-server';
+import { redirect } from 'next/navigation';
 
 export interface AuthUser {
   id: string;
   email: string;
   name: string;
   role: string;
-}
-
-export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 12);
-}
-
-export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
-  return bcrypt.compare(password, hashedPassword);
-}
-
-export function generateToken(payload: any): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
-}
-
-export function verifyToken(token: string): any {
-  try {
-    return jwt.verify(token, JWT_SECRET);
-  } catch {
-    return null;
-  }
+  isAdmin: boolean;
 }
 
 export async function getCurrentUser(): Promise<AuthUser | null> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('auth-token')?.value;
-    
-    if (!token) return null;
-    
-    const decoded = verifyToken(token);
-    if (!decoded) return null;
-    
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      select: { id: true, email: true, name: true, role: true, isAdmin: true }
-    });
-    
-    return user;
-  } catch {
-    return null;
-  }
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  if (!user) return null;
+  
+  const { data: profile } = await supabase
+    .from('users')
+    .select('*')
+    .eq('id', user.id)
+    .single();
+  
+  return profile ? {
+    id: user.id,
+    email: user.email!,
+    name: profile.name,
+    role: profile.role,
+    isAdmin: profile.is_admin ?? false
+  } : null;
 }
 
-export async function requireAuth(): Promise<AuthUser> {
+export async function requireAuth(redirectTo?: string): Promise<AuthUser> {
   const user = await getCurrentUser();
   if (!user) {
-    throw new Error('Authentication required');
+    const target = redirectTo ? `/login?redirectTo=${encodeURIComponent(redirectTo)}` : '/login';
+    redirect(target);
   }
   return user;
 }
