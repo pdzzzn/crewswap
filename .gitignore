@@ -9,3 +9,6 @@ codebase.md
 
 # YoYo AI version control directory
 .yoyo/
+
+# Logs
+logs/
