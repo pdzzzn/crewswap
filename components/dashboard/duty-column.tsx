@@ -1,18 +1,7 @@
 'use client';
 
-import { Card, CardContent } from '@/components/ui/card';
 import DutyCard from '@/components/dashboard/duty-card';
-import { Plane } from 'lucide-react';
-
-interface Duty {
-  id: string;
-  flightNumber: string;
-  date: string;
-  departureTime: string;
-  arrivalTime: string;
-  departureLocation: string;
-  arrivalLocation: string;
-}
+import { Duty } from '@/lib/types';
 
 interface DutyColumnProps {
   date: string;

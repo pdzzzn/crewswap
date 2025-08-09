@@ -1,31 +1,18 @@
-
-export const dynamic = "force-dynamic";
-
+import { createClient } from '../../../lib/supabase-server';
+import { getCurrentUser } from '../../../lib/auth';
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
-  try {
-    const user = await requireAuth();
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const duties = await prisma.duty.findMany({
-      where: { userId: user.id },
-      orderBy: { date: 'asc' }
-    });
+  const supabase = await createClient();
+  const { data: duties, error } = await supabase
+    .from('duties')
+    .select('*, flight_legs(*), users(name, role)')
+    .eq('user_id', user.id)
+    .order('date', { ascending: false });
 
-    return NextResponse.json({ duties });
-  } catch (error) {
-    console.error('Fetch duties error:', error);
-    if (error instanceof Error && error.message === 'Authentication required') {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
-    }
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(duties);
 }

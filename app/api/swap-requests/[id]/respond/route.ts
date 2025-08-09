@@ -2,8 +2,7 @@
 export const dynamic = "force-dynamic";
 
 import { NextRequest, NextResponse } from 'next/server';
-import {Prisma } from '@prisma/client';
-import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
 export async function PATCH(
@@ -14,6 +13,7 @@ export async function PATCH(
     const user = await requireAuth();
     const { action, responseMessage } = await request.json();
     const { id } = params;
+    const supabase = await createClient();
 
     if (!action || !['approve', 'deny'].includes(action)) {
       return NextResponse.json(
@@ -22,21 +22,21 @@ export async function PATCH(
       );
     }
 
-    // Find the swap request
-    const swapRequest = await prisma.swapRequest.findFirst({
-      where: {
-        id,
-        receiverId: user.id,
-        status: 'PENDING'
-      },
-      include: {
-        sender: { select: { id: true, name: true } },
-        senderDuty: true,
-        targetDuty: true,
-      }
-    });
+    // Find the swap request with related data
+    const { data: swapRequest, error: findError } = await supabase
+      .from('swap_requests')
+      .select(`
+        *,
+        sender:users!sender_id(id, name),
+        sender_duty:duties!sender_duty_id(*),
+        target_duty:duties!target_duty_id(*)
+      `)
+      .eq('id', id)
+      .eq('receiver_id', user.id)
+      .eq('status', 'PENDING')
+      .single();
 
-    if (!swapRequest) {
+    if (findError || !swapRequest) {
       return NextResponse.json(
         { error: 'Swap request not found or already processed' },
         { status: 404 }
@@ -45,47 +45,68 @@ export async function PATCH(
 
     const status = action === 'approve' ? 'APPROVED' : 'DENIED';
     
-    // Start transaction for swap approval
-    const result = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-      // Update swap request status
-      const updatedRequest = await tx.swapRequest.update({
-        where: { id },
-        data: {
-          status,
-          responseMessage: responseMessage || null,
-        }
-      });
+    // Update swap request status
+    const { data: updatedRequest, error: updateError } = await supabase
+      .from('swap_requests')
+      .update({
+        status,
+        response_message: responseMessage || null,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', id)
+      .select()
+      .single();
 
-      if (action === 'approve') {
-        // Swap the duties between users
-        await tx.duty.update({
-          where: { id: swapRequest.senderDutyId },
-          data: { userId: user.id }
-        });
+    if (updateError) {
+      console.error('Update swap request error:', updateError);
+      return NextResponse.json({ error: updateError.message }, { status: 500 });
+    }
 
-        await tx.duty.update({
-          where: { id: swapRequest.targetDutyId },
-          data: { userId: swapRequest.senderId }
-        });
+    // If approved, swap the duties between users
+    if (action === 'approve') {
+      // Update sender duty to belong to receiver (current user)
+      const { error: senderDutyError } = await supabase
+        .from('duties')
+        .update({ user_id: user.id })
+        .eq('id', swapRequest.sender_duty_id);
+
+      if (senderDutyError) {
+        console.error('Update sender duty error:', senderDutyError);
+        return NextResponse.json({ error: 'Failed to swap duties' }, { status: 500 });
       }
 
-      // Create notification for sender
-      await tx.notification.create({
-        data: {
-          userId: swapRequest.senderId,
-          type: action === 'approve' ? 'SWAP_REQUEST_APPROVED' : 'SWAP_REQUEST_DENIED',
-          title: `Swap Request ${action === 'approve' ? 'Approved' : 'Denied'}`,
-          message: `${user.name} has ${action === 'approve' ? 'approved' : 'denied'} your swap request`,
-          swapRequestId: id,
-        }
+      // Update target duty to belong to sender
+      const { error: targetDutyError } = await supabase
+        .from('duties')
+        .update({ user_id: swapRequest.sender_id })
+        .eq('id', swapRequest.target_duty_id);
+
+      if (targetDutyError) {
+        console.error('Update target duty error:', targetDutyError);
+        return NextResponse.json({ error: 'Failed to swap duties' }, { status: 500 });
+      }
+    }
+
+    // Create notification for sender
+    const { error: notificationError } = await supabase
+      .from('notifications')
+      .insert({
+        user_id: swapRequest.sender_id,
+        type: action === 'approve' ? 'SWAP_REQUEST_APPROVED' : 'SWAP_REQUEST_DENIED',
+        title: `Swap Request ${action === 'approve' ? 'Approved' : 'Denied'}`,
+        message: `${user.name} has ${action === 'approve' ? 'approved' : 'denied'} your swap request`,
+        swap_request_id: id,
+        is_read: false
       });
 
-      return updatedRequest;
-    });
+    if (notificationError) {
+      console.error('Create notification error:', notificationError);
+      // Don't fail the request if notification creation fails
+    }
 
     return NextResponse.json({
       message: `Swap request ${action === 'approve' ? 'approved' : 'denied'} successfully`,
-      swapRequest: result
+      swapRequest: updatedRequest
     });
   } catch (error) {
     console.error('Respond to swap request error:', error);

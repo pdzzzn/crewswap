@@ -6,10 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Calendar, Plane, Clock, Users } from 'lucide-react';
 import Header from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 import {User} from '@/lib/types';
 
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
   const [stats, setStats] = useState({
     totalDuties: 0,
     upcomingDuties: 0,
@@ -20,35 +22,63 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-        setIsLoading(true);
-        try {
-            const [userResponse, statsResponse] = await Promise.all([
-                fetch('/api/auth/me'),
-                fetch('/api/dashboard/stats')
-            ]);
+    if (!loading && !user) {
+      router.push('/login');
+      return;
+    }
 
-            if (userResponse.ok) {
-                const userData = await userResponse.json();
-                setUser(userData.user);
-            } else {
-                router.push('/login');
-                return;
-            }
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user, loading, router]);
 
-            if (statsResponse.ok) {
-                const statsData = await statsResponse.json();
-                setStats(statsData.stats);
-            }
-        } catch (error) {
-            console.error('Failed to fetch dashboard data:', error);
-            router.push('/login');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-    fetchDashboardData();
-  }, []);
+  const fetchDashboardData = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      // Fetch dashboard stats using direct Supabase queries
+      const [dutiesResult, upcomingDutiesResult, pendingSwapsResult, completedSwapsResult] = await Promise.all([
+        // Total duties assigned to user
+        supabase
+          .from('duties')
+          .select('id', { count: 'exact' })
+          .eq('assigned_user_id', user.id),
+        
+        // Upcoming duties (future dates)
+        supabase
+          .from('duties')
+          .select('id', { count: 'exact' })
+          .eq('assigned_user_id', user.id)
+          .gte('date', new Date().toISOString().split('T')[0]),
+        
+        // Pending swap requests (sent by user)
+        supabase
+          .from('swap_requests')
+          .select('id', { count: 'exact' })
+          .eq('sender_id', user.id)
+          .eq('status', 'PENDING'),
+        
+        // Completed swap requests (sent by user)
+        supabase
+          .from('swap_requests')
+          .select('id', { count: 'exact' })
+          .eq('sender_id', user.id)
+          .eq('status', 'APPROVED')
+      ]);
+
+      setStats({
+        totalDuties: dutiesResult.count || 0,
+        upcomingDuties: upcomingDutiesResult.count || 0,
+        pendingSwaps: pendingSwapsResult.count || 0,
+        completedSwaps: completedSwapsResult.count || 0
+      });
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const formatRole = (role: string) => {
     return role.replace('_', ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());

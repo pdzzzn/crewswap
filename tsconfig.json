@@ -13,7 +13,8 @@
     "esModuleInterop": true,
     "downlevelIteration": true,  // <--- ADD THIS LINE
     "module": "esnext",
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
+    "baseUrl": ".",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",

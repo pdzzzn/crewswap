@@ -6,3 +6,6 @@
 node_modules/
 codebase.md
 .next/*
+
+# YoYo AI version control directory
+.yoyo/

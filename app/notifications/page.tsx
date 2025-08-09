@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -10,9 +9,10 @@ import { format } from 'date-fns';
 import Header from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase';
 
 import { User} from '@/lib/types';
-
 
 interface Notification {
   id: string;
@@ -25,39 +25,48 @@ interface Notification {
 }
 
 export default function NotificationsPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const { toast } = useToast();
+  const supabase = createClient();
 
   useEffect(() => {
-    fetchUserData();
-    fetchNotifications();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('/api/auth/me');
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        router.push('/login');
-      }
-    } catch (error) {
-      console.error('Failed to fetch user data:', error);
+    if (!loading && !user) {
       router.push('/login');
+      return;
     }
-  };
+
+    if (user) {
+      fetchNotifications();
+    }
+  }, [user, loading, router]);
 
   const fetchNotifications = async () => {
+    if (!user) return;
+    
     try {
-      const response = await fetch('/api/notifications');
-      if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.notifications);
+      const { data: notifications, error } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        return;
       }
+
+      setNotifications(notifications.map(notification => ({
+        id: notification.id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        isRead: notification.is_read,
+        swapRequestId: notification.swap_request_id,
+        createdAt: notification.created_at
+      })));
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
     } finally {
@@ -67,21 +76,36 @@ export default function NotificationsPage() {
 
   const markAsRead = async (notificationId: string) => {
     try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH',
-      });
+      const { error } = await supabase
+        .from('notifications')
+        .update({ is_read: true })
+        .eq('id', notificationId);
 
-      if (response.ok) {
-        setNotifications(prev =>
-          prev.map(notification =>
-            notification.id === notificationId
-              ? { ...notification, isRead: true }
-              : notification
-          )
-        );
+      if (error) {
+        console.error('Error marking notification as read:', error);
+        return;
       }
+
+      // Update local state
+      setNotifications(prev => 
+        prev.map(notification => 
+          notification.id === notificationId 
+            ? { ...notification, isRead: true }
+            : notification
+        )
+      );
+
+      toast({
+        title: 'Notification marked as read',
+        description: 'The notification has been updated.',
+      });
     } catch (error) {
       console.error('Failed to mark notification as read:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to mark notification as read.',
+        variant: 'destructive',
+      });
     }
   };
 

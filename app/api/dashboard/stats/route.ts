@@ -2,58 +2,65 @@
 export const dynamic = "force-dynamic";
 
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { createClient } from '@/lib/supabase-server';
 import { requireAuth } from '@/lib/auth';
 
 export async function GET() {
   try {
     const user = await requireAuth();
-    const now = new Date();
-    const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const supabase = await createClient();
+    const now = new Date().toISOString();
+    const thirtyDaysFromNow = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
 
-    const [totalDuties, upcomingDuties, pendingSwaps, completedSwaps] = await Promise.all([
-      // Total duties assigned to user
-      prisma.duty.count({
-        where: { userId: user.id }
-      }),
+    // Get total duties count
+    const { count: totalDuties, error: totalError } = await supabase
+      .from('duties')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id);
 
-      // Upcoming duties in next 30 days
-      prisma.duty.count({
-        where: {
-          userId: user.id,
-          date: {
-            gte: now,
-            lte: thirtyDaysFromNow
-          }
-        }
-      }),
+    if (totalError) {
+      console.error('Total duties count error:', totalError);
+      return NextResponse.json({ error: totalError.message }, { status: 500 });
+    }
 
-      // Pending swap requests (sent or received)
-      prisma.swapRequest.count({
-        where: {
-          OR: [
-            { senderId: user.id },
-            { receiverId: user.id }
-          ],
-          status: 'PENDING'
-        }
-      }),
+    // Get upcoming duties count
+    const { count: upcomingDuties, error: upcomingError } = await supabase
+      .from('duties')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('date', now)
+      .lte('date', thirtyDaysFromNow);
 
-      // Completed swaps this month
-      prisma.swapRequest.count({
-        where: {
-          OR: [
-            { senderId: user.id },
-            { receiverId: user.id }
-          ],
-          status: 'APPROVED',
-          updatedAt: {
-            gte: startOfMonth
-          }
-        }
-      })
-    ]);
+    if (upcomingError) {
+      console.error('Upcoming duties count error:', upcomingError);
+      return NextResponse.json({ error: upcomingError.message }, { status: 500 });
+    }
+
+    // Get pending swap requests count
+    const { count: pendingSwaps, error: pendingError } = await supabase
+      .from('swap_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'PENDING')
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
+
+    if (pendingError) {
+      console.error('Pending swaps count error:', pendingError);
+      return NextResponse.json({ error: pendingError.message }, { status: 500 });
+    }
+
+    // Get completed swaps this month count
+    const { count: completedSwaps, error: completedError } = await supabase
+      .from('swap_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'APPROVED')
+      .gte('updated_at', startOfMonth)
+      .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`);
+
+    if (completedError) {
+      console.error('Completed swaps count error:', completedError);
+      return NextResponse.json({ error: completedError.message }, { status: 500 });
+    }
 
     const stats = {
       totalDuties,

@@ -17,21 +17,8 @@ import { Badge } from '@/components/ui/badge';
 import { Plane, ArrowRight, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { Duty } from '@/lib/types';
 
-interface Duty {
-  id: string;
-  flightNumber: string;
-  date: string;
-  departureTime: string;
-  arrivalTime: string;
-  departureLocation: string;
-  arrivalLocation: string;
-  user?: {
-    id: string;
-    name: string;
-    role: string;
-  };
-}
 
 interface SwapRequestModalProps {
   isOpen: boolean;
@@ -140,29 +127,32 @@ export default function SwapRequestModal({
           {/* Your Duty */}
           <div>
             <h3 className="text-lg font-semibold mb-3">Your Duty</h3>
-            <Card className="border-blue-200 bg-primary/10">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Plane className="w-5 h-5 text-primary" />
-                    <div>
-                      <p className="font-bold text-primary">{senderDuty.flightNumber}</p>
-                      <p className="text-sm text-muted-foreground">{formatDate(senderDuty.date)}</p>
+            <div className="p-4 rounded-lg bg-muted/50">
+              <h4 className="font-semibold mb-3 text-foreground">Your Duty to Swap</h4>
+              <p className="text-sm text-muted-foreground mb-3">
+                Date: {formatDate(senderDuty.date)}
+              </p>
+              <div className="space-y-3 max-h-40 overflow-y-auto pr-2">
+                {senderDuty.legs.map((leg) => (
+                  <div key={leg.id} className="p-3 rounded-md bg-background border">
+                    <div className="flex items-center justify-between font-semibold text-sm">
+                      <span>{leg.flightNumber}</span>
+                    </div>
+                    <div className="flex items-center justify-between text-sm mt-2">
+                      <div className="text-left">
+                        <div className="font-medium">{leg.departureLocation}</div>
+                        <div className="text-muted-foreground">{formatTime(leg.departureTime)}</div>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-muted-foreground mx-2 flex-shrink-0" />
+                      <div className="text-right">
+                        <div className="font-medium">{leg.arrivalLocation}</div>
+                        <div className="text-muted-foreground">{formatTime(leg.arrivalTime)}</div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">{senderDuty.departureLocation}</span>
-                    <ArrowRight className="w-4 h-4" />
-                    <span className="text-sm font-medium">{senderDuty.arrivalLocation}</span>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium">
-                      {formatTime(senderDuty.departureTime)} - {formatTime(senderDuty.arrivalTime)}
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Available Duties */}
@@ -177,37 +167,30 @@ export default function SwapRequestModal({
                     key={duty.id}
                     className={`cursor-pointer transition-all ${
                       selectedDuty?.id === duty.id 
-                        ? 'border-green-500 bg-green-50' 
-                        : 'hover:border-gray-300'
+                        ? 'border-primary bg-primary/5'
+                        : 'hover:border-muted-foreground/50'
                     }`}
                     onClick={() => setSelectedDuty(duty)}
                   >
-                    <CardContent className="p-4">
+                    <CardHeader className="pb-2 pt-3 px-4">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <Plane className="w-4 h-4 text-muted-foreground" />
-                          <div>
-                            <p className="font-semibold">{duty.flightNumber}</p>
-                            <p className="text-sm text-muted-foreground">{formatDate(duty.date)}</p>
-                          </div>
-                        </div>
                         <div className="flex items-center gap-2">
-                          <span className="text-sm">{duty.departureLocation}</span>
-                          <ArrowRight className="w-3 h-3" />
-                          <span className="text-sm">{duty.arrivalLocation}</span>
+                          <User className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-semibold text-sm">{duty.user?.name}</span>
+                          <Badge variant="secondary" className="text-xs">{formatRole(duty.user?.role || '')}</Badge>
                         </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium">
-                            {formatTime(duty.departureTime)} - {formatTime(duty.arrivalTime)}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1">
-                            <User className="w-3 h-3 text-muted-foreground/70" />
-                            <span className="text-xs text-muted-foreground">{duty.user?.name}</span>
-                            <Badge variant="secondary" className="text-xs ml-1">
-                              {formatRole(duty.user?.role || '')}
-                            </Badge>
+                        <span className="text-xs text-muted-foreground">{formatDate(duty.date)}</span>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4 pt-2">
+                      <div className="space-y-2">
+                        {duty.legs.map(leg => (
+                          <div key={leg.id} className="text-xs flex items-center justify-between text-muted-foreground">
+                            <span>{leg.flightNumber}</span>
+                            <span>{leg.departureLocation} → {leg.arrivalLocation}</span>
+                            <span>{formatTime(leg.departureTime)} - {formatTime(leg.arrivalTime)}</span>
                           </div>
-                        </div>
+                        ))}
                       </div>
                     </CardContent>
                   </Card>

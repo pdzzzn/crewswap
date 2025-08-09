@@ -1,5 +1,21 @@
 Whats next:
 
+
+
+[✔]1. Update roster page:
+    [✔] - Each row of "other duties" should be by a single user:
+        I.e. If a user has 6 days of duties uploaded, only they should be in a single row. 
+        +-------------+--------+--------+--------+--------+--------+--------+
+        | User        | Duty 1 | Duty 2 | Duty 3 | Duty 4 | Duty 5 | Duty 6 |
+        +-------------+--------+--------+--------+--------+--------+--------+
+        | currentUser |   X    |   X    |   X    |        |        |        |
+        +-------------+--------+--------+--------+--------+--------+--------+
+        | userA       |   X    |   X    |   X    |   X    |   X    |   X    |
+        | userB       |   X    |   X    |   X    |        |        |        |
+        | userC       |   X    |   X    |   X    |   X    |        |        |
+        | userD       |   X    |   X    |        |        |        |        |
+        +-------------+--------+--------+--------+--------+--------+--------+
+        
 [✔]1. Update duty modal: 
     - Auto close datepicker after date selection
     - Manual date entry
@@ -9,16 +25,27 @@ Whats next:
     [ ] - Update duty Modal to allow entry of multiple legs.
     [ ] - Update duty Modal to allow "linking" of duties, that have to be swapped together.
 
-[ ]3. Insert Duties from Modal into database
+[ ] 3. Add roster parser python script to site. ( Rewrite in TS? )
+    [ ] - Check if the parser has to be updated to accommodate the new duty structure.
+        [ ] - Update parser to handle duty pairings with duties for each day/ duty pairing.
+        
+    [ ] - Script will parse a roster file and insert the duties into the duty modal. 
+        [ ] - A select duty modal will be opened for each duty that should be added to the staging modal.
+            [ ] - A list view of the duties is ideal initially. 
+    [ ] - For now only add manual duty entry. 
+        [ ] - The structure needs updating. 
+            [ ] - Create a placeholder variable to designate hard linked duty days. These days will only be swapped in a "package". 
+                    (For each day a link)
+            [ ] - Create a nested array of duties by day within the duty pairing. 
 
-[✔]4. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
-[ ]5. Add filters to roster page 
+[ ]4. Insert Duties from Modal into database
+
+[✔]5. Filter duties on roster page to show only duties from users of the same group (i.e. Captains only see Duties posted by other Captains etc.)
+
+[ ]6. Add filters to roster page 
     - Filter by Departure Location
     - Arrival Location
     - Layover or not layover.
-
-
-
 
 To be done later: 
 [✔] 1. Adding admin role with admin dashboard permissions   
@@ -29,29 +56,23 @@ To be done later:
     [ ]- Add debug log viewer. 
 [ ] 3. Add layover designator to roster page. 
     [ ] - Roster page will have layovers marked with a line like in regular roster.
-
-[ ] 4. Add roster parser python script to site. 
-    [ ] - Script will parse a roster file and insert the duties into the duty modal. 
-        [ ] - A select duty modal will be opened for each duty that should be added to the staging modal.
-            [ ] - A list view of the duties is ideal initially. 
-
     
 
 X. At some point add a function to only swap multiple duties at once.
     I.e. only mark a full layover as swappable.
     Some sort of linking of duties will be necessary. 
 
+X. Add functionalities to check the Rest time etc between your own duties and the offered duties.  
 
 XX. Translate parser from python to TypeScript.
 
 
 Duty Pairing structure:
 {
-  "id": "pairing456",
+  "id": "dutyDay123",
   "pairingId": "P456", // Or some other identifier for the whole trip
-  "startDate": "2025-07-15",
-  "endDate": "2025-07-17",
-  "totalDuration": "48h 30m",
+  "date": "2025-07-15",
+  "linkID": "P456", // null = no link link, or PXXX for linked duty designator. Unique ID for each group of linked duties. Set by user in duty modal.
   "legs": [
     {
       "id": "leg1",
@@ -63,17 +84,11 @@ Duty Pairing structure:
       "arrivalLocation": "FCO"
     },
     {
-      "id": "layover1",
-      "type": "layover", // You can explicitly define layovers
-      "location": "FCO",
-      "duration": "26h 0m"
-    },
-    {
       "id": "leg2",
       "flightNumber": "BA2491",
-      "date": "2025-07-16",
-      "departureTime": "2025-07-16T13:30:00Z",
-      "arrivalTime": "2025-07-16T15:00:00Z",
+      "date": "2025-07-15",
+      "departureTime": "2025-07-15T13:30:00Z",
+      "arrivalTime": "2025-07-15T15:00:00Z",
       "departureLocation": "FCO",
       "arrivalLocation": "LHR"
     }

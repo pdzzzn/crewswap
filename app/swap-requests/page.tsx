@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -32,6 +31,8 @@ import { format } from 'date-fns';
 import Header from '@/components/layout/header';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 interface User {
   id: string;
@@ -76,8 +77,10 @@ interface SwapRequest {
   };
 }
 
+// using shared supabase client
+
 export default function SwapRequestsPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user, loading } = useAuth();
   const [sentRequests, setSentRequests] = useState<SwapRequest[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<SwapRequest[]>([]);
   const [responseMessage, setResponseMessage] = useState('');
@@ -87,32 +90,43 @@ export default function SwapRequestsPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchUserData();
-    fetchSwapRequests();
-  }, []);
-
-  const fetchUserData = async () => {
-    try {
-      const response = await fetch('/api/auth/me');
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        router.push('/login');
-      }
-    } catch (error) {
-      console.error('Failed to fetch user data:', error);
+    if (!loading && !user) {
       router.push('/login');
+      return;
     }
-  };
 
-  const fetchSwapRequests = async () => {
+    if (user) {
+      fetchSwapRequests(user.id);
+    }
+  }, [user, loading, router]);
+
+  const fetchSwapRequests = async (userId: string) => {
     try {
-      const response = await fetch('/api/swap-requests');
-      if (response.ok) {
-        const data = await response.json();
-        setSentRequests(data.sentRequests);
-        setReceivedRequests(data.receivedRequests);
+      const { data, error } = await supabase
+        .from('swap_requests')
+        .select('*, sender:sender_id (id, name, role), receiver:receiver_id (id, name, role), senderDuty:duty_id (id, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation), targetDuty:target_duty_id (id, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation)')
+        .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
+
+      if (error) {
+        console.error('Failed to fetch swap requests:', error);
+      } else {
+        const requests: SwapRequest[] = (data ?? []).map((request: any) => ({
+          id: request.id,
+          status: request.status,
+          message: request.message,
+          responseMessage: request.responseMessage,
+          createdAt: request.created_at,
+          sender: request.sender,
+          receiver: request.receiver,
+          senderDuty: request.senderDuty,
+          targetDuty: request.targetDuty,
+        }));
+
+        const sentRequests = requests.filter((request: SwapRequest) => request.sender?.id === userId);
+        const receivedRequests = requests.filter((request: SwapRequest) => request.receiver?.id === userId);
+
+        setSentRequests(sentRequests);
+        setReceivedRequests(receivedRequests);
       }
     } catch (error) {
       console.error('Failed to fetch swap requests:', error);
@@ -123,24 +137,24 @@ export default function SwapRequestsPage() {
 
   const handleResponse = async (requestId: string, action: 'approve' | 'deny') => {
     try {
-      const response = await fetch(`/api/swap-requests/${requestId}/respond`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, responseMessage }),
-      });
+      const { error } = await supabase
+        .from('swap_requests')
+        .update({ status: action === 'approve' ? 'APPROVED' : 'DENIED', responseMessage })
+        .eq('id', requestId);
 
-      if (response.ok) {
-        toast({
-          title: `Request ${action === 'approve' ? 'Approved' : 'Denied'}`,
-          description: `You have ${action === 'approve' ? 'approved' : 'denied'} the swap request.`,
-        });
-        fetchSwapRequests();
-        setSelectedRequest(null);
-        setResponseMessage('');
-      } else {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to respond to request');
+      if (error) {
+        throw new Error(error.message || 'Failed to respond to request');
       }
+
+      toast({
+        title: `Request ${action === 'approve' ? 'Approved' : 'Denied'}`,
+        description: `You have ${action === 'approve' ? 'approved' : 'denied'} the swap request.`,
+      });
+      if (user) {
+        fetchSwapRequests(user.id);
+      }
+      setSelectedRequest(null);
+      setResponseMessage('');
     } catch (error) {
       toast({
         title: 'Response Failed',
@@ -363,7 +377,7 @@ export default function SwapRequestsPage() {
     </Card>
   );
 
-  if (!user || isLoading) {
+  if (loading || !user || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
