@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { createClient } from '@/lib/supabase-server';
 import type { StagedDutyBlock, DutyType } from '@/lib/types';
-import { logToFile } from '@/lib/logger';
+import { logError, logInfo } from '@/lib/app-logger';
 
 function tsFrom(date: string, time?: string, fallback: 'start' | 'end' = 'start'): string {
   const t = time && time.trim() ? time : (fallback === 'start' ? '00:00' : '23:59');
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     .lte('date', maxTs);
 
   if (fetchErr) {
-    logToFile(`Import fetch error: ${fetchErr.message}`, 'error.log');
+    await logError('Import fetch error', { area: 'import', route: '/api/duties/import', meta: { error: fetchErr.message } });
     return NextResponse.json({ error: 'Failed to query existing duties' }, { status: 500 });
   }
 
@@ -99,7 +99,7 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (dutyErr || !dutyIns) {
-      logToFile(`Duty insert error: ${dutyErr?.message}`, 'error.log');
+      await logError('Duty insert error', { area: 'import', route: '/api/duties/import', meta: { error: dutyErr?.message } });
       results.push({ legsInserted: 0, legsSkipped: legs.length });
       continue;
     }
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
 
     const { error: legsErr } = await supabase.from('flight_legs').insert(rows);
     if (legsErr) {
-      logToFile(`Legs insert error: ${legsErr.message}`, 'error.log');
+      await logError('Legs insert error', { area: 'import', route: '/api/duties/import', meta: { error: legsErr.message } });
       results.push({ createdDutyId: dutyIns.id, legsInserted: 0, legsSkipped: legs.length });
       continue;
     }
@@ -127,6 +127,6 @@ export async function POST(req: NextRequest) {
     results.push({ createdDutyId: dutyIns.id, legsInserted: newLegs.length, legsSkipped: legs.length - newLegs.length });
   }
 
-  logToFile(`Import completed: ${JSON.stringify(results)}`, 'import.log');
+  await logInfo('Import completed', { area: 'import', route: '/api/duties/import', meta: { resultsCount: results.length } });
   return NextResponse.json({ ok: true, results });
 }

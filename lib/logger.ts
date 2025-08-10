@@ -1,10 +1,36 @@
 import fs from 'fs';
 import path from 'path';
 
-// Ensure logs directory exists
-const logsDir = path.join(process.cwd(), 'logs');
-if (!fs.existsSync(logsDir)) {
-  fs.mkdirSync(logsDir, { recursive: true });
+// Lightweight, serverless-safe logger utilities
+let cachedLogsDir: string | null = null;
+
+function isServerlessEnv(): boolean {
+  return Boolean(
+    process.env.VERCEL ||
+      process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.LAMBDA_TASK_ROOT ||
+      process.env.NOW_REGION
+  );
+}
+
+function resolveLogsDir(): string | null {
+  if (cachedLogsDir !== null) return cachedLogsDir;
+
+  const baseDir = isServerlessEnv() ? '/tmp' : process.cwd();
+  const dir = path.join(baseDir, 'logs');
+  try {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    cachedLogsDir = dir;
+  } catch (err) {
+    console.error(
+      'Logger: unable to create logs directory; falling back to console-only logging.',
+      err
+    );
+    cachedLogsDir = null;
+  }
+  return cachedLogsDir;
 }
 
 /**
@@ -15,13 +41,21 @@ if (!fs.existsSync(logsDir)) {
 export function logToFile(message: string, filename: string = 'app.log'): void {
   const timestamp = new Date().toISOString();
   const logMessage = `[${timestamp}] ${message}\n`;
-  
-  const logFilePath = path.join(logsDir, filename);
-  
+
+  const dir = resolveLogsDir();
+  if (!dir) {
+    // Fall back to console logging when filesystem is not writable
+    console.log(logMessage.trim());
+    return;
+  }
+
+  const logFilePath = path.join(dir, filename);
+
   try {
     fs.appendFileSync(logFilePath, logMessage);
   } catch (error) {
-    console.error(`Failed to write to log file: ${error}`);
+    console.error(`Failed to write to log file ${logFilePath}:`, error);
+    console.log(logMessage.trim());
   }
 }
 
@@ -32,8 +66,17 @@ export function logToFile(message: string, filename: string = 'app.log'): void {
 export function logIcsContent(icsContent: string): void {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `ics-content-${timestamp}.log`;
-  const logFilePath = path.join(logsDir, filename);
-  
+  const dir = resolveLogsDir();
+  if (!dir) {
+    console.log('[ICS CONTENT START]');
+    console.log(icsContent);
+    console.log('[ICS CONTENT END]');
+    logToFile('ICS content logging fell back to console', 'parsing.log');
+    return;
+  }
+
+  const logFilePath = path.join(dir, filename);
+
   try {
     fs.writeFileSync(logFilePath, icsContent);
     logToFile(`ICS content saved to ${filename}`, 'parsing.log');
@@ -50,8 +93,15 @@ export function logIcsContent(icsContent: string): void {
 export function logParsedDuties(duties: any[]): void {
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
   const filename = `parsed-duties-${timestamp}.log`;
-  const logFilePath = path.join(logsDir, filename);
-  
+  const dir = resolveLogsDir();
+  if (!dir) {
+    console.log(`[PARSED DUTIES SAVED] count=${duties?.length ?? 0}`);
+    logToFile('Parsed duties logging fell back to console', 'parsing.log');
+    return;
+  }
+
+  const logFilePath = path.join(dir, filename);
+
   try {
     fs.writeFileSync(logFilePath, JSON.stringify(duties, null, 2));
     logToFile(`Parsed duties saved to ${filename}`, 'parsing.log');

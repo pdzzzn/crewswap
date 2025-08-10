@@ -4,12 +4,11 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { parseIcsToDuties } from '../lib/ics';
-import { logParsedDuties, logToFile } from '../lib/logger';
 
 function usage() {
-  console.log(`Usage: yarn parse:ics [--file <path-to-ics-or-log>]
+  console.log(`Usage: yarn parse:ics --file <path-to-ics-or-log>
 
-If --file is omitted, the script will try to find the newest file matching logs/ics-content-*.log.
+If --file is omitted, the script will try to find the newest file matching logs/ics-content-*.log (deprecated).
 `);
 }
 
@@ -58,15 +57,11 @@ async function main() {
   }
 
   const content = fs.readFileSync(targetPath, 'utf-8');
-  logToFile(`Parsing ICS from ${path.relative(process.cwd(), targetPath)}`, 'parsing.log');
+  console.log(`Parsing ICS from ${path.relative(process.cwd(), targetPath)}`);
   const duties = parseIcsToDuties(content);
 
   // Write parsed duties to logs as well
-  try {
-    logParsedDuties(duties as any[]);
-  } catch (err) {
-    // Non-fatal
-  }
+  // No file logging; print summary to stdout only
 
   // Print to stdout
   console.log(JSON.stringify({ file: targetPath, count: duties.length, duties }, null, 2));

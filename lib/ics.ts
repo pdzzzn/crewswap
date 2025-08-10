@@ -1,4 +1,4 @@
-import { logToFile } from './logger';
+// No logging here; keep parser pure and side-effect free
 
 export interface ParsedDuty {
   id: string;
@@ -15,7 +15,6 @@ export interface ParsedDuty {
  * Robust parser tailored to Dienstplan-Konverter ICS export.
  */
 export function parseIcsToDuties(icsContent: string): ParsedDuty[] {
-  logToFile('Parsing .ics file content (robust parser)...', 'parsing.log');
 
   const duties: ParsedDuty[] = [];
 
@@ -145,10 +144,8 @@ export function parseIcsToDuties(icsContent: string): ParsedDuty[] {
       arrivalLocation,
     };
 
-    logToFile(`Parsed duty: ${JSON.stringify(duty)}`, 'parsing.log');
     duties.push(duty);
   }
 
-  logToFile(`Total parsed duties: ${duties.length}`, 'parsing.log');
   return duties;
 }

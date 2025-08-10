@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { logToFile, logIcsContent, logParsedDuties } from '@/lib/logger';
+import { logInfo, logError } from '@/lib/app-logger';
 import { parseIcsToDuties } from '@/lib/ics';
 import type { ParsedDuty } from '@/lib/ics';
 import path from 'path';
@@ -62,10 +62,13 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
             return NextResponse.json({ error: 'No file uploaded.' }, { status: 400 });
         }
 
-        logToFile(`Received file: ${file.originalname}`, 'parsing.log');
+        await logInfo('ICS convert: request received', {
+            area: 'ics',
+            route: '/api/convert-roster',
+            meta: { filename: file.originalname }
+        });
 
         // --- Step 1: Forward the file to the external service ---
-        logToFile('Step 1: Forwarding file...', 'parsing.log');
         const form = new FormData();
         form.append('file', file.buffer, file.originalname);
         form.append('MAX_FILE_SIZE', '10000000');
@@ -77,20 +80,20 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
         });
 
         // --- Step 2: Parse the HTML response for the download link ---
-        logToFile('Step 2: Parsing response...', 'parsing.log');
         const $ = cheerio.load(uploadResponse.data);
         const downloadLink = $('.modal-footer a').first().attr('href');
 
         if (!downloadLink) {
-            logToFile('Could not find the download link.', 'error.log');
+            await logError('ICS convert failed: could not find download link', {
+                area: 'ics',
+                route: '/api/convert-roster'
+            });
             return NextResponse.json({ error: 'Conversion failed: Could not find download link.' }, { status: 500 });
         }
         
         const fullDownloadUrl = BASE_URL + downloadLink;
-        logToFile(`Found download link: ${fullDownloadUrl}`, 'parsing.log');
 
         // --- Step 3: Download the .ics file ---
-        logToFile('Step 3: Downloading .ics file...', 'parsing.log');
         const fileResponse = await axios({
             method: 'get',
             url: fullDownloadUrl,
@@ -98,12 +101,13 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
         });
 
         // --- Step 4: Parse the .ics file and return duties as JSON ---
-        logToFile('Step 4: Parsing file to duties...', 'parsing.log');
-        logIcsContent(fileResponse.data);
         const duties = parseIcsToDuties(fileResponse.data);
         
-        logToFile(`Parsed ${duties.length} duties from .ics file`, 'parsing.log');
-        logParsedDuties(duties);
+        await logInfo('ICS convert success', {
+            area: 'ics',
+            route: '/api/convert-roster',
+            meta: { dutiesCount: duties.length }
+        });
         
         // Return the parsed duties as JSON
         return NextResponse.json({ duties }, { status: 200 });
@@ -112,6 +116,11 @@ export async function POST(request: NextRequest): Promise<NextResponse | Respons
         // Type-safe error handling
         const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         console.error('[API] An error occurred:', errorMessage);
+        await logError('ICS convert error', {
+            area: 'ics',
+            route: '/api/convert-roster',
+            meta: { error: errorMessage }
+        });
         return NextResponse.json({ error: 'An error occurred on the server.' }, { status: 500 });
     }
 }
