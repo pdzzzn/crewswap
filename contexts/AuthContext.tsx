@@ -100,10 +100,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = (email: string, password: string) => 
-    supabase.auth.signInWithPassword({ email, password });
+  const signIn = async (email: string, password: string) => {
+    // 1) Sign in via server route to set HttpOnly cookies (SSR-aware)
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include',
+    });
+
+    if (!res.ok) {
+      let msg = 'Login failed';
+      try {
+        const data = await res.json();
+        msg = data?.error || msg;
+      } catch {}
+      return { error: { message: msg } };
+    }
+
+    // 2) Also sign in on the client to keep client-side session/state in sync
+    //    (Supabase JS cannot read HttpOnly cookies.)
+    const clientResult = await supabase.auth.signInWithPassword({ email, password });
+    if (!clientResult.error) {
+      // Refresh user/profile state
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) await fetchUserProfile(authUser);
+    }
+    return clientResult;
+  };
   
-  const signOut = async () => { await supabase.auth.signOut(); };
+  const signOut = async () => {
+    // 1) Invalidate server-side cookies
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+    // 2) Clear client-side session
+    await supabase.auth.signOut();
+    setUser(null);
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
