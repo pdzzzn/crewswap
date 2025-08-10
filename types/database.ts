@@ -232,6 +232,51 @@ export type Database = {
           },
         ]
       }
+      app_logs: {
+        Row: {
+          id: string
+          created_at: string
+          level: string
+          area: string | null
+          route: string | null
+          message: string
+          meta: Json | null
+          user_id: string | null
+          request_id: string | null
+          correlation_id: string | null
+          artifact_type: string | null
+          artifact_path: string | null
+        }
+        Insert: {
+          id?: string
+          created_at?: string
+          level: string
+          area?: string | null
+          route?: string | null
+          message: string
+          meta?: Json | null
+          user_id?: string | null
+          request_id?: string | null
+          correlation_id?: string | null
+          artifact_type?: string | null
+          artifact_path?: string | null
+        }
+        Update: {
+          id?: string
+          created_at?: string
+          level?: string
+          area?: string | null
+          route?: string | null
+          message?: string
+          meta?: Json | null
+          user_id?: string | null
+          request_id?: string | null
+          correlation_id?: string | null
+          artifact_type?: string | null
+          artifact_path?: string | null
+        }
+        Relationships: []
+      }
       users: {
         Row: {
           base: Database["public"]["Enums"]["EWLBases"] | null

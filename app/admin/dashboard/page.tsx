@@ -62,7 +62,7 @@ export default function AdminDashboardPage() {
             } as React.CSSProperties
           }
         >
-          <AppSidebar variant="floating" />
+          <AppSidebar variant="floating"/>
           
           <SidebarInset className="flex-1 overflow-y-auto">
             <main className="container max-w-screen-xl mx-auto px-4 py-8">
@@ -139,6 +139,7 @@ export default function AdminDashboardPage() {
                 <div className="mt-8">
                     <DataTable data={data} />
                 </div>
+                {/* Logs moved to dedicated /admin/logs page */}
               </div>
             </main>
           </SidebarInset>
