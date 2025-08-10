@@ -6,7 +6,7 @@
 node_modules/
 codebase.md
 .next/*
-
+vercellogs.log
 # YoYo AI version control directory
 .yoyo/
 
