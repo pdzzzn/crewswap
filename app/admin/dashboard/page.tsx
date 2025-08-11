@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ShieldCheck, Plane, Users, BarChart3 } from "lucide-react";
 import { User } from "@/lib/types";
 import { useAuth } from "@/contexts/AuthContext";
+import { createClient } from "@/lib/supabase";
 
 import { AppSidebar } from "@/components/app-sidebar";
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
@@ -18,6 +19,13 @@ import data from "./data.json";
 export default function AdminDashboardPage() {
   const { user, loading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [statsError, setStatsError] = useState<string | null>(null);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    totalDuties: 0,
+    activeSwaps: 0,
+  });
   const router = useRouter();
 
   useEffect(() => {
@@ -35,6 +43,47 @@ export default function AdminDashboardPage() {
       setIsLoading(false);
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    async function fetchStats() {
+      if (!user || !user.isAdmin) return;
+      setStatsLoading(true);
+      setStatsError(null);
+      const supabase = createClient();
+      try {
+        const [usersRes, dutiesRes, swapsRes] = await Promise.all([
+          supabase.from("users").select("*", { count: "exact", head: true }),
+          supabase.from("duties").select("*", { count: "exact", head: true }),
+          supabase
+            .from("swap_requests")
+            .select("*", { count: "exact", head: true })
+            .eq("status", "PENDING"),
+        ]);
+
+        if (usersRes.error || dutiesRes.error || swapsRes.error) {
+          throw new Error(
+            usersRes.error?.message ||
+              dutiesRes.error?.message ||
+              swapsRes.error?.message ||
+              "Failed to load stats"
+          );
+        }
+
+        setStats({
+          totalUsers: usersRes.count ?? 0,
+          totalDuties: dutiesRes.count ?? 0,
+          activeSwaps: swapsRes.count ?? 0,
+        });
+      } catch (err) {
+        console.error("Admin stats error:", err);
+        setStatsError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setStatsLoading(false);
+      }
+    }
+
+    fetchStats();
+  }, [user]);
 
   if (isLoading || !user) {
     return (
@@ -84,7 +133,7 @@ export default function AdminDashboardPage() {
                     <Users className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">142</div>
+                    <div className="text-2xl font-bold">{statsLoading ? "—" : stats.totalUsers.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
                       +5 new this month
                     </p>
@@ -98,7 +147,7 @@ export default function AdminDashboardPage() {
                     <Plane className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">1,234</div>
+                    <div className="text-2xl font-bold">{statsLoading ? "—" : stats.totalDuties.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
                       +120 this month
                     </p>
@@ -112,7 +161,7 @@ export default function AdminDashboardPage() {
                     <BarChart3 className="h-4 w-4 text-muted-foreground" />
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">89</div>
+                    <div className="text-2xl font-bold">{statsLoading ? "—" : stats.activeSwaps.toLocaleString()}</div>
                     <p className="text-xs text-muted-foreground">
                       Awaiting resolution
                     </p>

@@ -2,6 +2,7 @@
 
 import { MailIcon, PlusCircleIcon, type LucideIcon } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -21,6 +22,7 @@ export function NavMain({
     icon?: LucideIcon
   }[]
 }) {
+  const pathname = usePathname()
   return (
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
@@ -44,16 +46,19 @@ export function NavMain({
           </SidebarMenuItem>
         </SidebarMenu>
         <SidebarMenu>
-          {items.map((item) => (
+          {items.map((item) => {
+            const isActive = pathname === item.url || pathname.startsWith(item.url + "/")
+            return (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton tooltip={item.title} asChild>
+              <SidebarMenuButton tooltip={item.title} asChild isActive={isActive}>
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
-          ))}
+            )
+          })}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

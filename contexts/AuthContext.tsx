@@ -18,10 +18,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) fetchUserProfile(session.user);
-      else setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (session?.user) fetchUserProfile(session.user);
+        else setLoading(false);
+      })
+      .catch((err) => {
+        console.error('getSession failed:', err);
+        setLoading(false);
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -94,6 +100,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           role: finalProfile.role,
           isAdmin: finalProfile.is_admin ?? false
         });
+      } else {
+        // Fallback: if profile row is missing or RLS blocked, still set a minimal
+        // authenticated user so the app can proceed. This mirrors the server-side
+        // fallback in lib/auth.ts.
+        const md = authUser.user_metadata || {};
+        const fallbackName = (typeof md.name === 'string' && md.name) || authUser.email || 'User';
+        const fallbackRole = typeof md.role === 'string' ? md.role : 'CABIN_ATTENDANT';
+        setUser({
+          id: authUser.id,
+          email: authUser.email!,
+          name: fallbackName,
+          role: fallbackRole,
+          isAdmin: false,
+        });
       }
     } finally {
       setLoading(false);
@@ -120,13 +140,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // 2) Also sign in on the client to keep client-side session/state in sync
     //    (Supabase JS cannot read HttpOnly cookies.)
-    const clientResult = await supabase.auth.signInWithPassword({ email, password });
-    if (!clientResult.error) {
-      // Refresh user/profile state
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) await fetchUserProfile(authUser);
+    try {
+      const clientResult = await supabase.auth.signInWithPassword({ email, password });
+      if (!clientResult.error) {
+        try {
+          // Refresh user/profile state
+          const { data: { user: authUser } } = await supabase.auth.getUser();
+          if (authUser) await fetchUserProfile(authUser);
+        } catch (err) {
+          console.error('getUser after client sign-in failed:', err);
+        }
+      }
+      return clientResult;
+    } catch (err: any) {
+      console.error('Client signInWithPassword failed:', err);
+      return { error: { message: err?.message || 'Client sign-in failed' } };
     }
-    return clientResult;
   };
   
   const signOut = async () => {
