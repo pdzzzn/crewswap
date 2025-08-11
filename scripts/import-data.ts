@@ -76,7 +76,7 @@ async function importData() {
         arrival_time: duty.arrivalTime,
         departure_location: duty.departureLocation,
         arrival_location: duty.arrivalLocation,
-        assigned_user_id: assignedUserId
+        user_id: assignedUserId
       }).select().single();
 
       if (error) {

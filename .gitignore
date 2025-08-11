@@ -13,3 +13,6 @@ vercellogs.log
 
 # Logs
 logs/
+
+# Schema
+schema.sql

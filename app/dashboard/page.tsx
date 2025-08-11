@@ -43,13 +43,13 @@ export default function DashboardPage() {
         supabase
           .from('duties')
           .select('id', { count: 'exact' })
-          .eq('assigned_user_id', user.id),
+          .eq('user_id', user.id),
         
         // Upcoming duties (future dates)
         supabase
           .from('duties')
           .select('id', { count: 'exact' })
-          .eq('assigned_user_id', user.id)
+          .eq('user_id', user.id)
           .gte('date', new Date().toISOString().split('T')[0]),
         
         // Pending swap requests (sent by user)
