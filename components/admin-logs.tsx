@@ -3,6 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
 
 interface AppLogRow {
   id: string;
@@ -31,7 +38,7 @@ function LevelBadge({ level }: { level: string }) {
     : level === "info" ? "bg-blue-100 text-blue-700"
     : level === "debug" ? "bg-gray-100 text-gray-700"
     : "bg-slate-100 text-slate-700";
-  return <span className={`px-2 py-0.5 rounded text-xs font-medium ${color}`}>{level}</span>;
+  return <Badge variant="outline" className={`text-xs font-medium ${color}`}>{level}</Badge>;
 }
 
 export default function AdminLogs() {
@@ -150,115 +157,75 @@ export default function AdminLogs() {
 
   return (
     <section className="mt-10">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Application Logs</h2>
-        <div className="flex items-center gap-2">
-          <select
-            className="border rounded px-2 py-1 bg-background"
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            title="Time range"
-          >
-            <option value={1}>Last 24h</option>
-            <option value={3}>Last 3 days</option>
-            <option value={7}>Last 7 days</option>
-            <option value={14}>Last 14 days</option>
-            <option value={30}>Last 30 days</option>
-          </select>
-          <select
-            className="border rounded px-2 py-1 bg-background"
-            value={level}
-            onChange={(e) => setLevel(e.target.value)}
-            title="Level"
-          >
-            <option value="">All levels</option>
-            <option value="error">error</option>
-            <option value="warn">warn</option>
-            <option value="info">info</option>
-            <option value="debug">debug</option>
-          </select>
-          <input
-            className="border rounded px-2 py-1 w-36 bg-background"
-            placeholder="Area"
-            value={area}
-            onChange={(e) => setArea(e.target.value)}
-          />
-          <input
-            className="border rounded px-2 py-1 w-44 bg-background"
-            placeholder="Route"
-            value={route}
-            onChange={(e) => setRoute(e.target.value)}
-          />
-          <input
-            className="border rounded px-2 py-1 w-56 bg-background"
-            placeholder="Search message/meta"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button
-            className="border rounded px-3 py-1 bg-primary text-primary-foreground disabled:opacity-50"
-            onClick={fetchLogs}
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Apply"}
-          </button>
-          <button
-            className={`border rounded px-3 py-1 ${liveTail ? 'bg-green-600 text-white' : 'bg-background'} disabled:opacity-50`}
-            onClick={() => setLiveTail((v) => !v)}
-            disabled={loading}
-            title="Live tail inserts"
-          >
-            {liveTail ? "Live: ON" : "Live: OFF"}
-          </button>
-          <div className="flex items-center gap-1 ml-2">
-            <button
-              className="border rounded px-2 py-1 bg-background disabled:opacity-50"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={loading || page === 1}
-              title="Previous page"
-            >
-              Prev
-            </button>
-            <span className="text-sm text-muted-foreground px-1">Page {page}</span>
-            <button
-              className="border rounded px-2 py-1 bg-background disabled:opacity-50"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={loading || !hasMore}
-              title="Next page"
-            >
-              Next
-            </button>
+      <div className="flex items-center flex-wrap gap-2 mb-4">
+          <Select value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+            <SelectTrigger className="w-[140px]" title="Time range">
+              <SelectValue placeholder="Time range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">Last 24h</SelectItem>
+              <SelectItem value="3">Last 3 days</SelectItem>
+              <SelectItem value="7">Last 7 days</SelectItem>
+              <SelectItem value="14">Last 14 days</SelectItem>
+              <SelectItem value="30">Last 30 days</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={level || "all"} onValueChange={(v) => setLevel(v === "all" ? "" : v)}>
+            <SelectTrigger className="w-[140px]" title="Level">
+              <SelectValue placeholder="All levels" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All levels</SelectItem>
+              <SelectItem value="error">error</SelectItem>
+              <SelectItem value="warn">warn</SelectItem>
+              <SelectItem value="info">info</SelectItem>
+              <SelectItem value="debug">debug</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input className="w-36" placeholder="Area" value={area} onChange={(e) => setArea(e.target.value)} />
+          <Input className="w-44" placeholder="Route" value={route} onChange={(e) => setRoute(e.target.value)} />
+          <Input className="w-56" placeholder="Search message/meta" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Button onClick={fetchLogs} disabled={loading} size="sm">{loading ? "Loading..." : "Apply"}</Button>
+          <div className="flex items-center gap-2 pl-2" title="Live tail inserts">
+            <Label htmlFor="live-tail" className="text-sm">Live</Label>
+            <Switch id="live-tail" checked={liveTail} onCheckedChange={setLiveTail} disabled={loading} />
           </div>
+      </div>
+
+      <div className="mb-3 flex items-center">
+        {error && (
+          <div className="text-sm text-red-600">{error}</div>
+        )}
+        <div className="flex items-center gap-1 ml-auto">
+          <Button variant="secondary" size="sm" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={loading || page === 1} title="Previous page">Prev</Button>
+          <span className="text-sm text-muted-foreground px-1">Page {page}</span>
+          <Button variant="secondary" size="sm" onClick={() => setPage((p) => p + 1)} disabled={loading || !hasMore} title="Next page">Next</Button>
         </div>
       </div>
 
-      {error && (
-        <div className="mb-3 text-sm text-red-600">{error}</div>
-      )}
-
       <div className="overflow-auto border rounded">
-        <table className="min-w-full text-sm">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left p-2 whitespace-nowrap">Time</th>
-              <th className="text-left p-2">Level</th>
-              <th className="text-left p-2">Area</th>
-              <th className="text-left p-2">Route</th>
-              <th className="text-left p-2">Message</th>
-              <th className="text-left p-2">Details</th>
-            </tr>
-          </thead>
-          <tbody>
+        <Table className="min-w-full text-sm">
+          <TableHeader>
+            <TableRow className="bg-muted/50">
+              <TableHead className="text-left p-2 whitespace-nowrap">Time</TableHead>
+              <TableHead className="text-left p-2">Level</TableHead>
+              <TableHead className="text-left p-2">Area</TableHead>
+              <TableHead className="text-left p-2">Route</TableHead>
+              <TableHead className="text-left p-2">Message</TableHead>
+              <TableHead className="text-left p-2">Details</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {logs.length === 0 && !loading && (
-              <tr>
-                <td colSpan={6} className="p-4 text-center text-muted-foreground">No logs found</td>
-              </tr>
+              <TableRow>
+                <TableCell colSpan={6} className="p-4 text-center text-muted-foreground">No logs found</TableCell>
+              </TableRow>
             )}
             {logs.map((r) => (
               <Row key={r.id} row={r} />
             ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
       </div>
     </section>
   );
@@ -268,30 +235,30 @@ function Row({ row }: { row: AppLogRow }) {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <tr className="border-b align-top">
-        <td className="p-2 whitespace-nowrap text-muted-foreground">{fmtDate(row.created_at)}</td>
-        <td className="p-2"><LevelBadge level={row.level} /></td>
-        <td className="p-2">{row.area || "-"}</td>
-        <td className="p-2">{row.route || "-"}</td>
-        <td className="p-2 break-words max-w-[40ch]">{row.message}</td>
-        <td className="p-2">
+      <TableRow className="border-b align-top">
+        <TableCell className="p-2 whitespace-nowrap text-muted-foreground">{fmtDate(row.created_at)}</TableCell>
+        <TableCell className="p-2"><LevelBadge level={row.level} /></TableCell>
+        <TableCell className="p-2">{row.area || "-"}</TableCell>
+        <TableCell className="p-2">{row.route || "-"}</TableCell>
+        <TableCell className="p-2 break-words max-w-[40ch]">{row.message}</TableCell>
+        <TableCell className="p-2">
           {(row.meta || row.request_id || row.correlation_id) ? (
-            <button className="underline text-primary" onClick={() => setOpen(!open)}>
+            <Button variant="link" size="sm" className="px-0" onClick={() => setOpen(!open)}>
               {open ? "Hide" : "View"}
-            </button>
+            </Button>
           ) : (
             <span className="text-muted-foreground">-</span>
           )}
-        </td>
-      </tr>
+        </TableCell>
+      </TableRow>
       {open && (
-        <tr className="border-b">
-          <td colSpan={6} className="p-2 bg-muted/30">
+        <TableRow className="border-b">
+          <TableCell colSpan={6} className="p-2 bg-muted/30">
             <pre className="text-xs whitespace-pre-wrap break-words">
 {JSON.stringify({ request_id: row.request_id, correlation_id: row.correlation_id, meta: row.meta }, null, 2)}
             </pre>
-          </td>
-        </tr>
+          </TableCell>
+        </TableRow>
       )}
     </>
   );
