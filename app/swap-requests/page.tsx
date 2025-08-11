@@ -104,23 +104,61 @@ export default function SwapRequestsPage() {
     try {
       const { data, error } = await supabase
         .from('swap_requests')
-        .select('*, sender:sender_id (id, name, role), receiver:receiver_id (id, name, role), senderDuty:duty_id (id, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation), targetDuty:target_duty_id (id, flightNumber, date, departureTime, arrivalTime, departureLocation, arrivalLocation)')
+        .select(`
+          *,
+          sender:users!sender_id (id, name, role),
+          receiver:users!receiver_id (id, name, role),
+          senderDuty:duties!sender_duty_id (
+            id, date, pairing, user_id,
+            legs:flight_legs!flight_legs_duty_id_fkey(
+              id, flight_number, departure_time, arrival_time,
+              departure_location, arrival_location, is_deadhead
+            )
+          ),
+          targetDuty:duties!target_duty_id (
+            id, date, pairing, user_id,
+            legs:flight_legs!flight_legs_duty_id_fkey(
+              id, flight_number, departure_time, arrival_time,
+              departure_location, arrival_location, is_deadhead
+            )
+          )
+        `)
         .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`);
 
       if (error) {
         console.error('Failed to fetch swap requests:', error);
       } else {
-        const requests: SwapRequest[] = (data ?? []).map((request: any) => ({
-          id: request.id,
-          status: request.status,
-          message: request.message,
-          responseMessage: request.responseMessage,
-          createdAt: request.created_at,
-          sender: request.sender,
-          receiver: request.receiver,
-          senderDuty: request.senderDuty,
-          targetDuty: request.targetDuty,
-        }));
+        const requests: SwapRequest[] = (data ?? []).map((request: any) => {
+          const sLeg = request.senderDuty?.legs?.[0];
+          const tLeg = request.targetDuty?.legs?.[0];
+          return {
+            id: request.id,
+            status: request.status,
+            message: request.message,
+            responseMessage: request.response_message,
+            createdAt: request.created_at,
+            sender: request.sender,
+            receiver: request.receiver,
+            senderDuty: {
+              id: request.senderDuty?.id,
+              flightNumber: sLeg?.flight_number ?? '',
+              date: request.senderDuty?.date,
+              departureTime: sLeg?.departure_time ?? '',
+              arrivalTime: sLeg?.arrival_time ?? '',
+              departureLocation: sLeg?.departure_location ?? '',
+              arrivalLocation: sLeg?.arrival_location ?? '',
+            },
+            targetDuty: {
+              id: request.targetDuty?.id,
+              flightNumber: tLeg?.flight_number ?? '',
+              date: request.targetDuty?.date,
+              departureTime: tLeg?.departure_time ?? '',
+              arrivalTime: tLeg?.arrival_time ?? '',
+              departureLocation: tLeg?.departure_location ?? '',
+              arrivalLocation: tLeg?.arrival_location ?? '',
+            },
+          } as SwapRequest;
+        });
 
         const sentRequests = requests.filter((request: SwapRequest) => request.sender?.id === userId);
         const receivedRequests = requests.filter((request: SwapRequest) => request.receiver?.id === userId);
@@ -139,7 +177,7 @@ export default function SwapRequestsPage() {
     try {
       const { error } = await supabase
         .from('swap_requests')
-        .update({ status: action === 'approve' ? 'APPROVED' : 'DENIED', responseMessage })
+        .update({ status: action === 'approve' ? 'APPROVED' : 'DENIED', response_message: responseMessage })
         .eq('id', requestId);
 
       if (error) {

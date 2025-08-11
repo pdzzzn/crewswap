@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +27,15 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { User } from "@/lib/types";
+
+function getInitials(name?: string) {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] ?? "" : "";
+  const initials = `${first}${last}`.toUpperCase();
+  return initials || first.toUpperCase();
+}
 
 interface HeaderProps {
   user: User | null;
@@ -104,13 +113,7 @@ export default function Header({ user }: HeaderProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Avatar className="h-9 w-9 cursor-pointer">
-                  <AvatarImage
-                    src={`https://avatar.vercel.sh/${user.email}.png`}
-                    alt={user.name}
-                  />
-                  <AvatarFallback>
-                    {user.name.charAt(0).toUpperCase()}
-                  </AvatarFallback>
+                  <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
