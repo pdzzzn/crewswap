@@ -1,5 +1,6 @@
 'use client';
 
+import type React from 'react';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,19 +11,34 @@ import SwapRequestModal from './swap-request-modal';
 import { Duty } from '@/lib/types';
 import { Separator } from '@/components/ui/separator'; // <-- Import Separator
 import { Fragment } from 'react'; // <-- Import Fragment
+import { cn } from '@/lib/utils';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface DutyCardProps {
   duty: Duty;
   onSwapRequested?: () => void;
   showSwapButton?: boolean;
   onDelete?: (dutyId: string) => void;
+  // Selection UX (optional)
+  selectable?: boolean;
+  selected?: boolean;
+  highlighted?: boolean;
+  disabled?: boolean;
+  onSelect?: (e?: any) => void;
+  showCheckbox?: boolean;
 }
 
 export default function DutyCard({
   duty,
   onSwapRequested,
   showSwapButton = true,
-  onDelete
+  onDelete,
+  selectable = false,
+  selected = false,
+  highlighted = false,
+  disabled = false,
+  onSelect,
+  showCheckbox = false,
 }: DutyCardProps) {
   const [showSwapModal, setShowSwapModal] = useState(false);
 
@@ -84,20 +100,56 @@ export default function DutyCard({
   return (
     <>
       {/* Reduced padding from py-6 to p-3, and gap from 6 to 3 */}
-      <Card className="hover:shadow-lg transition-shadow duration-200 bg-card border-border p-3 gap-3 h-full flex flex-col">
+      <Card
+        className={cn(
+          'relative hover:shadow-lg transition-shadow duration-200 bg-card border-border p-3 gap-3 h-full flex flex-col',
+          selectable && 'cursor-pointer',
+          selected && 'border-primary ring-2 ring-primary/30 bg-primary/5',
+          highlighted && 'ring-2 ring-primary/40 border-dashed animate-pulse',
+          disabled && 'opacity-50 cursor-not-allowed'
+        )}
+        role={selectable ? 'button' : undefined}
+        aria-pressed={selectable ? selected : undefined}
+        tabIndex={selectable ? 0 : undefined}
+        onClick={selectable && !disabled ? onSelect : undefined}
+        onKeyDown={
+          selectable && !disabled
+            ? (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onSelect?.(e);
+                }
+              }
+            : undefined
+        }
+      >
+        {(showCheckbox || selected) && (
+          <div className="absolute top-2 right-2 z-10" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={selected}
+              aria-label="Select duty"
+              onCheckedChange={() => onSelect?.({ via: 'checkbox' })}
+              disabled={disabled}
+              className="size-4"
+            />
+          </div>
+        )}
         {onDelete && (
           <Button
             variant="ghost"
             size="icon"
             className="absolute top-1 right-1 h-6 w-6 rounded-full z-10"
-            onClick={() => onDelete(duty.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(duty.id);
+            }}
           >
             <X className="h-3 w-3" />
           </Button>
         )}
         {/* Reduced padding: removed pb-3, using gap in parent Card instead */}
         <CardHeader className="p-0">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between pr-7">
             <CardTitle className="text-base font-bold flex items-center gap-2">
               <Plane className="h-4 w-4 text-primary" />
               {formatDate(duty.date)}

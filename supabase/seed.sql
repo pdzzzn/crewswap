@@ -1,0 +1,2 @@
+-- Seed file intentionally left empty.
+-- The project uses app-driven seeding; this exists to satisfy config.toml db.seed.sql_paths.

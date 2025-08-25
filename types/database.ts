@@ -315,7 +315,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      batch_create_swap_requests: {
+        Args: {
+          requests: Json
+          global_message?: string | null
+          atomic?: boolean
+        }
+        Returns: Json
+      }
     }
     Enums: {
       EWLBases:

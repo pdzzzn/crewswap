@@ -8,15 +8,14 @@ datasource db {
 }
 
 model User {
-  id                   String         @id @default(cuid())
+  id                   String         @id
   email                String         @unique
   name                 String
   role                 UserRole
-  password             String
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  createdAt            DateTime       @default(now()) @map("created_at")
+  updatedAt            DateTime       @updatedAt @map("updated_at")
   base                 EWLBases       @default(PMI)
-  isAdmin              Boolean        @default(false)
+  isAdmin              Boolean        @default(false) @map("is_admin")
   duties               Duty[]
   notifications        Notification[]
   receivedSwapRequests SwapRequest[]  @relation("SwapRequestReceiver")
@@ -28,9 +27,9 @@ model User {
 model Duty {
   id                 String        @id @default(uuid())
   date               DateTime
-  userId             String
-  createdAt          DateTime      @default(now())
-  updatedAt          DateTime      @updatedAt
+  userId             String        @map("user_id")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
   pairing            String?
   user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   legs               FlightLeg[]
@@ -42,31 +41,31 @@ model Duty {
 
 model FlightLeg {
   id                String   @id @default(uuid())
-  dutyId            String
-  flightNumber      String
-  departureTime     DateTime
-  arrivalTime       DateTime
-  departureLocation String
-  arrivalLocation   String
-  isDeadhead        Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  dutyId            String   @map("duty_id")
+  flightNumber      String   @map("flight_number")
+  departureTime     DateTime @map("departure_time")
+  arrivalTime       DateTime @map("arrival_time")
+  departureLocation String   @map("departure_location")
+  arrivalLocation   String   @map("arrival_location")
+  isDeadhead        Boolean  @default(false) @map("is_deadhead")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
   duty              Duty     @relation(fields: [dutyId], references: [id])
 
   @@map("flight_legs")
 }
 
 model SwapRequest {
-  id              String            @id @default(cuid())
-  senderId        String
-  receiverId      String
-  senderDutyId    String
-  targetDutyId    String
+  id              String            @id @default(uuid())
+  senderId        String            @map("sender_id")
+  receiverId      String            @map("receiver_id")
+  senderDutyId    String            @map("sender_duty_id")
+  targetDutyId    String            @map("target_duty_id")
   status          SwapRequestStatus @default(PENDING)
   message         String?
-  responseMessage String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  responseMessage String?           @map("response_message")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
   receiver        User              @relation("SwapRequestReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
   senderDuty      Duty              @relation("SwapRequestSenderDuty", fields: [senderDutyId], references: [id], onDelete: Cascade)
   sender          User              @relation("SwapRequestSender", fields: [senderId], references: [id], onDelete: Cascade)
@@ -76,14 +75,14 @@ model SwapRequest {
 }
 
 model Notification {
-  id            String           @id @default(cuid())
-  userId        String
+  id            String           @id @default(uuid())
+  userId        String           @map("user_id")
   type          NotificationType
   title         String
   message       String
-  isRead        Boolean          @default(false)
-  swapRequestId String?
-  createdAt     DateTime         @default(now())
+  isRead        Boolean          @default(false) @map("is_read")
+  swapRequestId String?          @map("swap_request_id")
+  createdAt     DateTime         @default(now()) @map("created_at")
   user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("notifications")

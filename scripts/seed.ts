@@ -1307,8 +1307,8 @@ async function main() {
     return;
   }
 
-  await prisma.flightLeg.deleteMany();
-  await prisma.duty.deleteMany();
+  // Preserve existing data; this seeder is additive and idempotent per user+day
+  console.log("↪️ Preserving existing duties and flight legs (no deletions).");
 
   const today = new Date();
   const maxOffset = 45; // Extended to 6+ weeks
@@ -1356,6 +1356,23 @@ async function main() {
         // 30% chance to skip for rest
         if (Math.random() < 0.3) continue;
       }
+
+      // Idempotency across runs: skip if a duty already exists for this user on this date in DB
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      const existingDuty = await prisma.duty.findFirst({
+        where: {
+          userId: user.id,
+          date: {
+            gte: startOfDay,
+            lte: endOfDay,
+          },
+        },
+        select: { id: true },
+      });
+      if (existingDuty) continue;
 
       if (!userDutyDates.has(user.id)) userDutyDates.set(user.id, new Set());
       userDutyDates.get(user.id)!.add(key);
@@ -1475,6 +1492,23 @@ async function main() {
         const assignedDates = userDutyDates.get(userId) || new Set();
 
         if (assignedDates.has(key)) continue; // Skip if already assigned
+
+        // Idempotency across runs: skip if a duty already exists for this user on this date in DB
+        const extStart = new Date(extDate);
+        extStart.setHours(0, 0, 0, 0);
+        const extEnd = new Date(extDate);
+        extEnd.setHours(23, 59, 59, 999);
+        const dutyExists = await prisma.duty.findFirst({
+          where: {
+            userId,
+            date: {
+              gte: extStart,
+              lte: extEnd,
+            },
+          },
+          select: { id: true },
+        });
+        if (dutyExists) continue;
 
         assignedDates.add(key);
 
